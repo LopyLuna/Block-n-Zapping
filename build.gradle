@@ -1,0 +1,207 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
+        maven { url = 'https://maven.parchmentmc.org' }
+
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forgegradle_version}", changing: false
+        classpath "org.parchmentmc:librarian:${librarian_version}"
+        classpath "org.spongepowered:mixingradle:0.7.+"
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: 'org.spongepowered.mixin'
+
+jarJar.enable()
+
+group = 'uwu.lopyluna.create_bnz'
+archivesBaseName = "Create-Block-n-Zapping-${minecraft_version}"
+version = mod_version
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
+minecraft {
+    mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'mixin.debug.countInjections', 'true'
+            arg '-mixin.config=create_bnz.mixins.json'
+
+            mods {
+                create_bnz {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', 'create_bnz'
+        }
+
+        server {
+            workingDirectory project.file('run-server')
+            property 'forge.enabledGameTestNamespaces', 'create_bnz'
+            args '--nogui'
+        }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', 'create_bnz'
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+
+            args '--mod', "create_bnz", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'), '--existing-mod', 'create'
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = 'tterrag maven'
+        url = 'https://maven.tterrag.com/'
+    }
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+    flatDir {
+        dirs "libs"
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
+
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}+${minecraft_version}:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}+${minecraft_version}")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.ranged(it, "[0.3.5,)")
+    }
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude '.cache/'
+}
+
+mixin {
+    config 'create_bnz.mixins.json'
+    add sourceSets.main, 'create_bnz.refmap.json'
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "create_bnz",
+                "Specification-Vendor"    : "lopyluna",
+                "Specification-Version"   : "1",
+                'Implementation-Title'    : project.jar.archiveBaseName,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "lopyluna",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs"            : "create_bnz.mixins.json"
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
+
+//Copied from Creates Github
+
+afterEvaluate {
+    tasks.configureReobfTaskForReobfJar.mustRunAfter(tasks.compileJava)
+    tasks.configureReobfTaskForReobfJarJar.mustRunAfter(tasks.compileJava)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+compileJava {
+    options.compilerArgs = ['-Xdiags:verbose']
+}
+
+task jarJarRelease {
+    group = 'jarjar'
+    doLast {
+        tasks.jarJar {
+            classifier = ''
+        }
+    }
+    finalizedBy tasks.jarJar
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+void addLicense(jarTask) {
+    jarTask.from('LICENSE') {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+jar.finalizedBy('reobfJar')
+tasks.jarJar.finalizedBy('reobfJarJar')
+
+addLicense(jar)
+addLicense(tasks.jarJar)
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = archivesBaseName
+
+            from components.java
+            fg.component(it)
+            jarJar.component(it)
+        }
+    }
+
+    repositories {
+        if (project.hasProperty('mavendir')) {
+            maven { url mavendir }
+        }
+    }
+}

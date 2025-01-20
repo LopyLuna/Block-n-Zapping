@@ -1,0 +1,34 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT-CODE, ARR-ART"
+
+[[mods]]
+modId="create_bnz"
+version="${file.jarVersion}"
+displayName="Create: Block n' Zapping"
+logoFile="pack.png"
+authors="LopyLuna"
+description='''
+YIPPEE WASSUP THIS HURTS MY HEAD LMAO
+'''
+
+[[dependencies.unify]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.unify]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.unify]]
+    modId="create"
+    mandatory=true
+    versionRange="[0.5.1.f,)"
+    ordering="AFTER"
+    side="BOTH"

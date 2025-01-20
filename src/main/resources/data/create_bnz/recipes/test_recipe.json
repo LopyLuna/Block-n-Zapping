@@ -1,0 +1,28 @@
+{
+  "type": "create_bnz:block_zapper_upgrade",
+  "acceptMirrored": false,
+  "modifierType": "Canister",
+  "key": {
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "S": {
+      "tag": "forge:stone"
+    },
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    }
+  },
+  "pattern": [
+    "APS",
+    "AZS",
+    "APS"
+  ],
+  "result": {
+    "count": 2,
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}
