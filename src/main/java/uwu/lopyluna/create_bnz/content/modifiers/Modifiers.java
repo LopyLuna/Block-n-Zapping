@@ -6,23 +6,40 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import static uwu.lopyluna.create_bnz.CreateBZ.MOD_ID;
+import static uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem.MODIFIERS;
 import static uwu.lopyluna.create_bnz.registry.BZLangPartial.LANG;
 
-public class ModifierBase {
-    public String id;
-    public ResourceLocation loc;
+public enum Modifiers {
+    EMPTY,
+    CANISTER("Canister", "Adds Block Storage Slots", 4),
+    BODY("Body", "Reinforce to use Stronger Blocks", 4),
+    AMPLIFIER("Amplifier", "Increases Radius", 4),
+    ACCELERATOR("Accelerator", "Reduces Cooldown", 4),
+    RETRIEVER("Retriever", "Ability to Obtain Blocks", 4),
+    SCOPE("Scope", "Increases Zapper Range", 4),
+    REINFORCER("Reinforcer", "Reinforce Durability", 4),
+    STASIS("Stasis", "Disallow Block Updates"),
+    APPLICATOR("Applicator", "Adds Modifier Slots", 2),
+    GENERATOR("Generator", "Renewable Blocks are Infinite")
+    ;
 
-    public String langDescription;
-    public String langName;
-    public String baseDescription;
-    public String baseName;
+    public final String id;
+    public final ResourceLocation loc;
 
-    public int maxLevel;
+    public final String langDescription;
+    public final String langName;
+    public final String baseDescription;
+    public final String baseName;
 
-    public ModifierBase(String baseName, String baseDescription) {
+    public final int maxLevel;
+
+    Modifiers() {
+        this("", "");
+    }
+    Modifiers(String baseName, String baseDescription) {
         this(baseName, baseDescription, 1);
     }
-    public ModifierBase(String baseName, String baseDescription, int maxLevel) {
+    Modifiers(String baseName, String baseDescription, int maxLevel) {
         id = baseName.replaceAll(" ", "_").toLowerCase();
         langName = "modifier." + MOD_ID + "." + id;
         langDescription = langName + ".desc";
@@ -33,6 +50,8 @@ public class ModifierBase {
 
         LANG.put(langName, this.baseName);
         LANG.put(langDescription, this.baseDescription);
+
+        MODIFIERS.add(this);
     }
 
     public String getId() {

@@ -28,7 +28,6 @@ public class CreateBZ {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-        ZapperModifiers.register();
         BZItems.register();
         BZTags.init();
         BZPackets.registerPackets();
