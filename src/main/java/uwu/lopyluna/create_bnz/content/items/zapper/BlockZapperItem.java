@@ -152,18 +152,20 @@ public class BlockZapperItem extends ZapperItem {
 		ItemStack itemStackOffhand = player.getItemInHand(InteractionHand.MAIN_HAND == hand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 
 		if (player.isShiftKeyDown() && itemStackOffhand.is(forgeItemTag("ingots"))) {
-			var bool = false;
-			if (itemStackOffhand.is(Items.BRICK)) bool = applyUpgrade(STASIS, item);
-			if (itemStackOffhand.is(Items.NETHER_BRICK)) bool = applyUpgrade(APPLICATOR, item);
+			int flag = 0;
+			if (itemStackOffhand.is(Items.NETHER_BRICK)) flag = applyUpgrade(APPLICATOR, item);
 
-			if (itemStackOffhand.is(Items.COPPER_INGOT)) bool = applyModifier(AMPLIFIER, item);
-			if (itemStackOffhand.is(Items.IRON_INGOT)) bool = applyModifier(BODY, item);
-			if (itemStackOffhand.is(Items.GOLD_INGOT)) bool = applyModifier(ACCELERATOR, item);
-			if (itemStackOffhand.is(Items.NETHERITE_INGOT)) bool = applyModifier(REINFORCER, item);
-			if (itemStackOffhand.is(AllItems.ANDESITE_ALLOY.asItem())) bool = applyModifier(CANISTER, item);
-			if (itemStackOffhand.is(AllItems.ZINC_INGOT.asItem())) bool = applyModifier(RETRIEVER, item);
-			if (itemStackOffhand.is(AllItems.BRASS_INGOT.asItem())) bool = applyModifier(SCOPE, item);
-			if (bool) {
+			if (itemStackOffhand.is(Items.COPPER_INGOT)) flag = applyModifier(AMPLIFIER, item);
+			if (itemStackOffhand.is(Items.IRON_INGOT)) flag = applyModifier(BODY, item);
+			if (itemStackOffhand.is(Items.GOLD_INGOT)) flag = applyModifier(ACCELERATOR, item);
+			if (itemStackOffhand.is(Items.NETHERITE_INGOT)) flag = applyModifier(REINFORCER, item);
+			if (itemStackOffhand.is(AllItems.ANDESITE_ALLOY.asItem())) flag = applyModifier(CANISTER, item);
+			if (itemStackOffhand.is(AllItems.ZINC_INGOT.asItem())) flag = applyModifier(RETRIEVER, item);
+			if (itemStackOffhand.is(AllItems.BRASS_INGOT.asItem())) flag = applyModifier(SCOPE, item);
+
+			if (flag == 5) AllSoundEvents.CRAFTER_CLICK.play(level, player, player.blockPosition());
+			if (flag == 3) AllSoundEvents.CONTRAPTION_DISASSEMBLE.play(level, player, player.blockPosition());
+			if (flag != 0) {
 				AllSoundEvents.WRENCH_REMOVE.play(level, player, player.blockPosition());
 				itemStackOffhand.shrink(1);
 			} else AllSoundEvents.DENY.play(level, player, player.blockPosition());
@@ -192,38 +194,42 @@ public class BlockZapperItem extends ZapperItem {
 		} else return super.use(level, player, hand);
 	}
 
-	public boolean applyModifier(Modifiers modifier, ItemStack pStack) {
+	public int applyModifier(Modifiers modifier, ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		int max = 3 + nbt.getInt(APPLICATOR.baseName);
 		String id = modifier.baseName;
 		if (!nbt.contains(id)) nbt.putInt(id, 0);
 		int i = nbt.getInt(id);
+		int f = 2;
 		for (int j = 0; j < max; j++) {
 			String slot = APPLIED_MODIFIER + j;
 			Modifiers modifiers = NBTHelper.readEnum(nbt, slot, Modifiers.class);
 			if (modifiers == modifier && i < modifier.maxLevel) {
+				if (i+1 == modifier.maxLevel) f = 3;
 				nbt.putInt(id, i+1);
-				return true;
+				return f;
 			} else if (modifiers == modifier) {
-				return false;
+				return 0;
 			} else if (modifiers == EMPTY) {
 				NBTHelper.writeEnum(nbt, slot, modifier);
 				nbt.putInt(id, 1);
-				return true;
+				return 1;
 			}
         }
-		return false;
+		return 0;
 	}
 
-	public boolean applyUpgrade(Modifiers modifier, ItemStack pStack) {
+	public int applyUpgrade(Modifiers modifier, ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		String id = modifier.baseName;
 		int i = nbt.getInt(id);
+		int f = 4;
 		if (i < modifier.maxLevel) {
+			if (i+1 == modifier.maxLevel) f = 5;
 			nbt.putInt(id, i+1);
-			return true;
+			return f;
 		}
-		return false;
+		return 0;
 	}
 
 	@Override
