@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "ACCELERATOR",
+  "tier": "ECHO",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:redstone_block"
+    },
+    "C": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    "AZ ",
+    "CCA"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -65,7 +65,7 @@ public class BlockZapperScreen extends ZapperScreen {
 		CompoundTag nbt = zapper.getOrCreateTag();
 		currentBrush = NBTHelper.readEnum(nbt, "Brush", TerrainBrushes.class);
 		if (nbt.contains("BrushParams", Tag.TAG_COMPOUND)) {
-			BlockPos paramsData = NbtUtils.readBlockPos(nbt.getCompound("BrushParams"));
+			BlockPos paramsData = ((BlockZapperItem)this.zapper.getItem()).fixSize(NbtUtils.readBlockPos(nbt.getCompound("BrushParams")), currentBrush.get(), this.zapper);
 			currentBrushParams[0] = paramsData.getX();
 			currentBrushParams[1] = paramsData.getY();
 			currentBrushParams[2] = paramsData.getZ();
@@ -158,6 +158,7 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	protected void initBrushParams(int x, int y) {
 		Brush currentBrush = this.currentBrush.get();
+		BlockZapperItem zapperItem = ((BlockZapperItem)zapper.getItem());
 
 		// Brush Params
 
@@ -172,7 +173,7 @@ public class BlockZapperScreen extends ZapperScreen {
 
 			final int finalIndex = index;
 			ScrollInput input = new ScrollInput(x + 56 + 20 * index, y + 40, 18, 18)
-				.withRange(currentBrush.getMin(index), currentBrush.getMax(index) + 1)
+				.withRange(currentBrush.getMin(index), zapperItem.indexMax(currentBrush.getMax(index), currentBrush, zapper) + 1)
 				.writingTo(label)
 				.titled(currentBrush.getParamLabel(index)
 					.plainCopy())
@@ -182,6 +183,7 @@ public class BlockZapperScreen extends ZapperScreen {
 				});
 			input.setState(currentBrushParams[index]);
 			input.onChanged();
+
 
 			if (index >= currentBrush.amtParams) {
 				input.visible = false;
@@ -310,11 +312,10 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	@Override
 	protected ConfigureZapperPacket getConfigurationPacket() {
+		currentBrushParams = ((BlockZapperItem)zapper.getItem()).fixSize(currentBrushParams, currentBrush.get(), zapper);
 		int brushParamX = currentBrushParams[0];
-		int brushParamY = followDiagonalsIndicator != null ? followDiagonalsIndicator.state == State.ON ? 0 : 1
-			: currentBrushParams[1];
-		int brushParamZ = acrossMaterialsIndicator != null ? acrossMaterialsIndicator.state == State.ON ? 0 : 1
-			: currentBrushParams[2];
+		int brushParamY = followDiagonalsIndicator != null ? followDiagonalsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[1];
+		int brushParamZ = acrossMaterialsIndicator != null ? acrossMaterialsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[2];
 		return new ConfigureBlockZapperPacket(hand, currentPattern, currentBrush, brushParamX, brushParamY, brushParamZ, currentTool, currentPlacement);
 	}
 

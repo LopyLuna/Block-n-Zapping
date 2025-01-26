@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "REINFORCER",
+  "tier": "ROSE_QUARTZ",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "tag": "forge:storage_blocks/zinc"
+    },
+    "C": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "AZA",
+    "CCC"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -1,4 +1,4 @@
-// 1.20.1	2025-01-18T19:20:22.7905023	Registrate Provider for create_bnz [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-9ec5757cd38f424f6830043a65e570687a307a4e assets/create_bnz/lang/en_ud.json
-ad7d276232da44121dfa91fc297fa80718c825b1 assets/create_bnz/lang/en_us.json
+// 1.20.1	2025-01-25T20:17:39.9038746	Registrate Provider for create_bnz [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+44e666952a33174a8803828356b86c731aff5056 assets/create_bnz/lang/en_ud.json
+ae0cf9b7dde95d8e4089d50de967da6f5501ce5f assets/create_bnz/lang/en_us.json
 4ae9ed667645f65adeaf054ee2b67eb6fd5ae1ba assets/create_bnz/models/item/handheld_block_zapper.json

@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "AMPLIFIER",
+  "tier": "ECHO",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:respawn_anchor"
+    },
+    "C": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    "  C",
+    "CZA",
+    "  C"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "CANISTER",
+  "tier": "ECHO",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:shulker_box"
+    },
+    "C": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    "CZC",
+    "CAC"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

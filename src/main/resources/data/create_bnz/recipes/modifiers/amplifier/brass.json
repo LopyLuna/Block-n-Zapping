@@ -1,0 +1,22 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "AMPLIFIER",
+  "tier": "BRASS",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "create:experience_nugget"
+    },
+    "C": {
+      "tag": "forge:ingots/brass"
+    }
+  },
+  "pattern": [
+    "CZA"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "BODY",
+  "tier": "ECHO",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:netherite_block"
+    },
+    "C": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    " C ",
+    "AZA",
+    " C "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

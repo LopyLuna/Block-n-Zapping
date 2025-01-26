@@ -1,7 +1,5 @@
 package uwu.lopyluna.create_bnz.content.items.zapper;
 
-import com.simibubi.create.AllItems;
-import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ShootableGadgetItemMethods;
@@ -12,6 +10,7 @@ import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.NBTHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +23,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -35,9 +34,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import uwu.lopyluna.create_bnz.content.items.zapper.tools.Brush;
-import uwu.lopyluna.create_bnz.content.items.zapper.tools.PlacementOptions;
-import uwu.lopyluna.create_bnz.content.items.zapper.tools.TerrainBrushes;
+import org.jetbrains.annotations.NotNull;
+import uwu.lopyluna.create_bnz.content.items.zapper.tools.*;
+import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
 import uwu.lopyluna.create_bnz.registry.BZItems;
 
@@ -46,7 +45,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.simibubi.create.AllTags.forgeItemTag;
+import static com.simibubi.create.foundation.item.TooltipHelper.styleFromColor;
+import static net.minecraft.client.gui.screens.Screen.hasControlDown;
+import static net.minecraft.client.gui.screens.Screen.hasShiftDown;
+import static uwu.lopyluna.create_bnz.BZUtils.holdCtrl;
 import static uwu.lopyluna.create_bnz.content.modifiers.Modifiers.*;
 
 @ParametersAreNonnullByDefault
@@ -66,15 +68,28 @@ public class BlockZapperItem extends ZapperItem {
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		var nbt = stack.getTag();
-		if (stack.hasTag() && nbt != null) {
-			int applicator = nbt.getInt(APPLICATOR.baseName);
-			int max = 3 + applicator;
-			if (applicator != 0) tooltip.add(Component.empty().append(APPLICATOR.getName()).append(" | ").append(applicator + "/" + APPLICATOR.maxLevel).append(" | Desc: ").append(APPLICATOR.getDescription()));
+		assert nbt != null;
 
-			for (int j = 0; j < max; j++) {
-				String slot = APPLIED_MODIFIER + j;
-				Modifiers modifiers = NBTHelper.readEnum(nbt, slot, Modifiers.class);
-				if (modifiers != EMPTY) tooltip.add(Component.empty().append("Slot" + j + ": ").append(modifiers.getName()).append(" | "+nbt.getInt(modifiers.baseName)+"/"+modifiers.maxLevel).append(" | Desc: ").append(modifiers.getDescription()));
+		if (!hasShiftDown()) {
+			tooltip.add(holdCtrl());
+			if (hasControlDown()) {
+				int slots = 0;
+				int maxSlots = getMaxModifierSlots(nbt);
+				for (int j = 0; j < maxSlots; j++) {
+					Modifiers modifiers = NBTHelper.readEnum(nbt, APPLIED_MODIFIER + j, Modifiers.class);
+					if (modifiers != EMPTY) {
+						int tier = modifiers.getLevel(nbt);
+						tooltip.add(modifiers.getName().append(tier != 0 ? " " + tier + "/" + modifiers.maxLevel + " Lvl" : "").withStyle(styleFromColor(modifiers.getTierFromModifier(nbt).color.getRGB())));
+						tooltip.add(modifiers.getDescription().withStyle(ChatFormatting.DARK_GRAY));
+						slots++;
+					}
+				}
+				tooltip.add(Component.empty()
+						.append(Component.literal("Modifiers: ").withStyle(ChatFormatting.GRAY))
+						.append(Component.literal(slots + "").withStyle(ChatFormatting.GOLD))
+						.append(Component.literal("/").withStyle(ChatFormatting.GRAY))
+						.append(Component.literal(maxSlots + ".").withStyle(ChatFormatting.DARK_GRAY))
+				);
 			}
 		}
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
@@ -107,7 +122,7 @@ public class BlockZapperItem extends ZapperItem {
 
 		CompoundTag tag = stack.getOrCreateTag();
 		Brush brush = NBTHelper.readEnum(tag, BRUSH, TerrainBrushes.class).get();
-		BlockPos params = NbtUtils.readBlockPos(tag.getCompound(BRUSH_PARAMS));
+		BlockPos params = fixSize(NbtUtils.readBlockPos(tag.getCompound(BRUSH_PARAMS)), brush, stack);
 		PlacementOptions option = NBTHelper.readEnum(tag, PLACEMENT, PlacementOptions.class);
 		TerrainTools tool = NBTHelper.readEnum(tag, TOOL, TerrainTools.class);
 
@@ -141,37 +156,26 @@ public class BlockZapperItem extends ZapperItem {
 			CompoundTag nbt = pStack.getOrCreateTag();
 
 			MODIFIERS.forEach(modifier -> modifier.update(nbt));
-			int max = 3 + nbt.getInt(APPLICATOR.baseName);
+			int max = getMaxModifierSlots(nbt);
 			if (!nbt.contains(MAX_SLOTS) || (nbt.getInt(MAX_SLOTS) != max)) nbt.putInt(MAX_SLOTS, max);
 		}
 	}
 
 	@Override
+	public @NotNull Rarity getRarity(ItemStack pStack) {
+		CompoundTag nbt = pStack.getOrCreateTag();
+		int echo_slots = 0;
+		for (int j = 0; j < 5; j++)
+			if (NBTHelper.readEnum(nbt, APPLIED_MODIFIER + j, Modifiers.class).getLevel(nbt) >= ModifierTier.ECHO.level) echo_slots++;
+		if (echo_slots == 5) return Rarity.EPIC;
+		if (echo_slots > 0) return Rarity.RARE;
+		return Rarity.UNCOMMON;
+	}
+
+
+	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack item = player.getItemInHand(hand);
-		ItemStack itemStackOffhand = player.getItemInHand(InteractionHand.MAIN_HAND == hand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-
-		if (player.isShiftKeyDown() && itemStackOffhand.is(forgeItemTag("ingots"))) {
-			int flag = 0;
-			if (itemStackOffhand.is(Items.NETHER_BRICK)) flag = applyUpgrade(APPLICATOR, item);
-
-			if (itemStackOffhand.is(Items.COPPER_INGOT)) flag = applyModifier(AMPLIFIER, item);
-			if (itemStackOffhand.is(Items.IRON_INGOT)) flag = applyModifier(BODY, item);
-			if (itemStackOffhand.is(Items.GOLD_INGOT)) flag = applyModifier(ACCELERATOR, item);
-			if (itemStackOffhand.is(Items.NETHERITE_INGOT)) flag = applyModifier(REINFORCER, item);
-			if (itemStackOffhand.is(AllItems.ANDESITE_ALLOY.asItem())) flag = applyModifier(CANISTER, item);
-			if (itemStackOffhand.is(AllItems.ZINC_INGOT.asItem())) flag = applyModifier(RETRIEVER, item);
-			if (itemStackOffhand.is(AllItems.BRASS_INGOT.asItem())) flag = applyModifier(SCOPE, item);
-
-			if (flag == 5) AllSoundEvents.CRAFTER_CLICK.play(level, player, player.blockPosition());
-			if (flag == 3) AllSoundEvents.CONTRAPTION_DISASSEMBLE.play(level, player, player.blockPosition());
-			if (flag != 0) {
-				AllSoundEvents.WRENCH_REMOVE.play(level, player, player.blockPosition());
-				itemStackOffhand.shrink(1);
-			} else AllSoundEvents.DENY.play(level, player, player.blockPosition());
-			return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
-		}
-
 
 		CompoundTag nbt = item.getOrCreateTag();
 		boolean mainHand = hand == InteractionHand.MAIN_HAND;
@@ -194,14 +198,22 @@ public class BlockZapperItem extends ZapperItem {
 		} else return super.use(level, player, hand);
 	}
 
-	public int applyModifier(Modifiers modifier, ItemStack pStack) {
-		CompoundTag nbt = pStack.getOrCreateTag();
-		int max = 3 + nbt.getInt(APPLICATOR.baseName);
+	public ItemStack setModifierToTier(Modifiers modifier, ModifierTier tier, ItemStack pStack) {
+        CompoundTag nbt = pStack.getOrCreateTag();
 		String id = modifier.baseName;
-		if (!nbt.contains(id)) nbt.putInt(id, 0);
-		int i = nbt.getInt(id);
+		nbt.putInt(id, tier.require_level + 1);
+		NBTHelper.writeEnum(nbt, "AppliedModifiers0", modifier);
+		return pStack;
+	}
+
+	public int applyModifier(Modifiers modifier, ItemStack pStack) {
+		if (modifier.isUpgrade) return applyUpgrade(modifier, pStack);
+		CompoundTag nbt = pStack.getOrCreateTag();
+		String id = modifier.baseName;
+		modifier.update(nbt);
+		int i = modifier.getLevel(nbt);
 		int f = 2;
-		for (int j = 0; j < max; j++) {
+		for (int j = 0; j < getMaxModifierSlots(nbt); j++) {
 			String slot = APPLIED_MODIFIER + j;
 			Modifiers modifiers = NBTHelper.readEnum(nbt, slot, Modifiers.class);
 			if (modifiers == modifier && i < modifier.maxLevel) {
@@ -222,14 +234,82 @@ public class BlockZapperItem extends ZapperItem {
 	public int applyUpgrade(Modifiers modifier, ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		String id = modifier.baseName;
-		int i = nbt.getInt(id);
+		int i = modifier.getLevel(nbt);
+		int max = modifier.maxLevel;
 		int f = 4;
-		if (i < modifier.maxLevel) {
-			if (i+1 == modifier.maxLevel) f = 5;
+		if (i < max) {
+			if (i+1 == max) f = 5;
 			nbt.putInt(id, i+1);
 			return f;
 		}
 		return 0;
+	}
+
+	public BlockPos fixSize(BlockPos params, Brush brush, ItemStack stack) {
+		int size = getMaxSize(stack);
+		int radius = getMaxRadius(stack);
+		int radiusSize = (int) (radius * 1.25);
+		int max = 1;
+		if (brush instanceof CuboidBrush) max = size;
+		if (brush instanceof SphereBrush) max = radiusSize;
+		if (brush instanceof CylinderBrush) max = radius;
+		if (brush instanceof DynamicBrush) max = radiusSize;
+		int x = Math.min(params.getX(), max);
+		int y = Math.min(params.getY(), max);
+		int z = Math.min(params.getZ(), max);
+		return new BlockPos(x, y, z);
+	}
+
+	public int indexMax(int index, Brush brush, ItemStack stack) {
+		int size = getMaxSize(stack);
+		int radius = getMaxRadius(stack);
+		int radiusSize = (int) (radius * 1.25);
+		int max = 1;
+		if (brush instanceof CuboidBrush) max = size;
+		if (brush instanceof SphereBrush) max = radiusSize;
+		if (brush instanceof CylinderBrush) max = radius;
+		if (brush instanceof DynamicBrush) max = radiusSize;
+		return Math.min(index, max);
+	}
+
+	public int[] fixSize(int[] params, Brush brush, ItemStack stack) {
+		int size = getMaxSize(stack);
+		int radius = getMaxRadius(stack);
+		int radiusSize = (int) (radius * 1.25);
+		int max = 1;
+		if (brush instanceof CuboidBrush) max = size;
+		if (brush instanceof SphereBrush) max = radiusSize;
+		if (brush instanceof CylinderBrush) max = radius;
+		if (brush instanceof DynamicBrush) max = radiusSize;
+		int x = Math.min(params[0], max);
+		int y = Math.min(params[1], max);
+		int z = Math.min(params[2], max);
+		return new int[] { x, y, z };
+	}
+
+	public int getMaxSize(ItemStack pStack) {
+		CompoundTag nbt = pStack.getOrCreateTag();
+		return switch (AMPLIFIER.getLevel(nbt)) {
+			case 1 -> 6;
+			case 2 -> 8;
+			case 3 -> 12;
+			case 4 -> 16;
+			default -> 4;
+		};
+	}
+	public int getMaxRadius(ItemStack pStack) {
+		CompoundTag nbt = pStack.getOrCreateTag();
+		return switch (AMPLIFIER.getLevel(nbt)) {
+			case 1 -> 3;
+			case 2 -> 4;
+			case 3 -> 5;
+			case 4 -> 6;
+			default -> 2;
+		};
+	}
+
+	public int getMaxModifierSlots(CompoundTag nbt) {
+		return nbt.getInt(APPLICATOR.baseName) > 0 ? 5 : 3;
 	}
 
 	@Override

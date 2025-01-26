@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "BODY",
+  "tier": "ROSE_QUARTZ",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:iron_block"
+    },
+    "C": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    " C ",
+    "AZA",
+    " C "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "REINFORCER",
+  "tier": "BRASS",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "tag": "forge:ingots/brass"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "AZA",
+    "CCC"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

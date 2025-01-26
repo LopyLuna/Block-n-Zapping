@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class SphereBrush extends ShapedBrush {
 
 	public static final int MAX_RADIUS = 10;
-	private Map<Integer, List<BlockPos>> cachedBrushes;
+	private final Map<Integer, List<BlockPos>> cachedBrushes;
 
 	public SphereBrush() {
 		super(1);

@@ -1,7 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "create_dd:item/block_zapper_mesh",
+		"0": "create_bnz:item/block_zapper_mesh",
 		"1": "block/smooth_stone_slab_side",
 		"particle": "block/obsidian",
 		"3_0": "block/obsidian"

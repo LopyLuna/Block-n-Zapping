@@ -13,13 +13,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class CylinderBrush extends ShapedBrush {
 
 	public static final int MAX_RADIUS = 8;
 	public static final int MAX_HEIGHT = 8;
-	private Map<Pair<Integer, Integer>, List<BlockPos>> cachedBrushes;
+	private final Map<Pair<Integer, Integer>, List<BlockPos>> cachedBrushes;
 
 	public CylinderBrush() {
 		super(2);
@@ -32,7 +31,7 @@ public class CylinderBrush extends ShapedBrush {
 					.map(BlockPos::new)
 					.filter(p -> VecHelper.getCenterOf(p)
 						.distanceTo(VecHelper.getCenterOf(BlockPos.ZERO)) < radius + .42f)
-					.collect(Collectors.toList());
+					.toList();
 			for (int h = 0; h <= MAX_HEIGHT; h++) {
 				List<BlockPos> stackedPositions = new ArrayList<>();
 				for (int layer = 0; layer < h; layer++) {
@@ -77,7 +76,7 @@ public class CylinderBrush extends ShapedBrush {
 
 	@Override
 	public List<BlockPos> getIncludedPositions() {
-		return cachedBrushes.get(Pair.of(Integer.valueOf(param0), Integer.valueOf(param1)));
+		return cachedBrushes.get(Pair.of(param0, param1));
 	}
 
 }

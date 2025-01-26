@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "RETRIEVER",
+  "tier": "OBSIDIAN",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:end_crystal"
+    },
+    "C": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    "CZC",
+    "CA "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

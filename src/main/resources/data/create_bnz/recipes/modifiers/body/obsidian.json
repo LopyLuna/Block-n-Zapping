@@ -1,0 +1,24 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "BODY",
+  "tier": "OBSIDIAN",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:diamond_block"
+    },
+    "C": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    " C ",
+    "AZA",
+    " C "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

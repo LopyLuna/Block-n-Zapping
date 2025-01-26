@@ -1,0 +1,26 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "SCOPE",
+  "tier": "ROSE_QUARTZ",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:spyglass"
+    },
+    "B": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "C": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    "BAC",
+    " Z "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

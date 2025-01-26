@@ -1,0 +1,8 @@
+{
+  "values": [
+    {
+      "id": "create_bnz:zapper_recipe",
+      "required": false
+    }
+  ]
+}

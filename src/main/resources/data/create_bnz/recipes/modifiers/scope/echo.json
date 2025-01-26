@@ -1,0 +1,26 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "SCOPE",
+  "tier": "ECHO",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:calibrated_sculk_sensor"
+    },
+    "B": {
+      "item": "minecraft:amethyst_block"
+    },
+    "C": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    "BAC",
+    " Z "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

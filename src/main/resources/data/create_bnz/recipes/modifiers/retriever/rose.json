@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "RETRIEVER",
+  "tier": "ROSE_QUARTZ",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:ender_pearl"
+    },
+    "C": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    "CZC",
+    "CA "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

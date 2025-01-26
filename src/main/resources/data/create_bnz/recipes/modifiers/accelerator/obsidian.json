@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "ACCELERATOR",
+  "tier": "OBSIDIAN",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:gold_block"
+    },
+    "C": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    "AZ ",
+    "CCA"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

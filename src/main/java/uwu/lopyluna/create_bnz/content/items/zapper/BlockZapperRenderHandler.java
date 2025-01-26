@@ -51,14 +51,14 @@ public class BlockZapperRenderHandler {
 			if (zapperInMain) {
 				CompoundTag tag = heldMain.getOrCreateTag();
 				if (!tag.contains("_Swap") || !zapperInOff) {
-					createBrushOutline(tag, player);
+					createBrushOutline(tag, player, heldMain);
 					return;
 				}
 			}
 
 			if (zapperInOff) {
 				CompoundTag tag = heldOff.getOrCreateTag();
-				createBrushOutline(tag, player);
+				createBrushOutline(tag, player, heldOff);
 				return;
 			}
 
@@ -66,34 +66,29 @@ public class BlockZapperRenderHandler {
 		}
 	}
 
-	public static void createBrushOutline(CompoundTag tag, LocalPlayer player) {
+	public static void createBrushOutline(CompoundTag tag, LocalPlayer player, ItemStack held) {
 		if (!tag.contains("BrushParams")) {
 			renderedPositions = null;
 			return;
 		}
+		BlockZapperItem zapperItem = (BlockZapperItem) held.getItem();
 
-		Brush brush = NBTHelper.readEnum(tag, "Brush", TerrainBrushes.class)
-			.get();
+		Brush brush = NBTHelper.readEnum(tag, "Brush", TerrainBrushes.class).get();
 		PlacementOptions placement = NBTHelper.readEnum(tag, "Placement", PlacementOptions.class);
 		TerrainTools tool = NBTHelper.readEnum(tag, "Tool", TerrainTools.class);
-		BlockPos params = NbtUtils.readBlockPos(tag.getCompound("BrushParams"));
+		BlockPos params = zapperItem.fixSize(NbtUtils.readBlockPos(tag.getCompound("BrushParams")), brush, held);
 		brush.set(params.getX(), params.getY(), params.getZ());
 
-		Vec3 start = player.position()
-			.add(0, player.getEyeHeight(), 0);
-		Vec3 range = player.getLookAngle()
-			.scale(128);
-		BlockHitResult raytrace = player.level()
-			.clip(new ClipContext(start, start.add(range), Block.OUTLINE, Fluid.NONE, player));
+		Vec3 start = player.position().add(0, player.getEyeHeight(), 0);
+		Vec3 range = player.getLookAngle().scale(zapperItem.getZappingRange(held));
+		BlockHitResult raytrace = player.level().clip(new ClipContext(start, start.add(range), Block.OUTLINE, Fluid.NONE, player));
 		if (raytrace.getType() == Type.MISS) {
 			renderedPositions = null;
 			return;
 		}
 
-		BlockPos pos = raytrace.getBlockPos()
-			.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), placement));
-		renderedPositions =
-			() -> brush.addToGlobalPositions(player.level(), pos, raytrace.getDirection(), new ArrayList<>(), tool);
+		BlockPos pos = raytrace.getBlockPos().offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), placement));
+		renderedPositions = () -> brush.addToGlobalPositions(player.level(), pos, raytrace.getDirection(), new ArrayList<>(), tool);
 	}
 
 }

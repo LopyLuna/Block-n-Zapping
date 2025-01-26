@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "SCOPE",
+  "tier": "OBSIDIAN",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:ender_eye"
+    },
+    "C": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    "AAC",
+    " Z "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "ACCELERATOR",
+  "tier": "ROSE_QUARTZ",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:amethyst_cluster"
+    },
+    "C": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    "AZ ",
+    "CCA"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

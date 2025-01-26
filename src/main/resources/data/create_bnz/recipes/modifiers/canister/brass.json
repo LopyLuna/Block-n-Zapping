@@ -1,0 +1,23 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "CANISTER",
+  "tier": "BRASS",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "A": {
+      "item": "minecraft:chest"
+    },
+    "C": {
+      "tag": "forge:ingots/brass"
+    }
+  },
+  "pattern": [
+    "CZC",
+    "CAC"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

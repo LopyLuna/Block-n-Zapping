@@ -15,7 +15,7 @@ public class DynamicBrush extends Brush {
 
 	public static final int MAX_RADIUS = 10;
 
-	private boolean surface;
+	private final boolean surface;
 
 	public DynamicBrush(boolean surface) {
 		super(1);
@@ -132,8 +132,7 @@ public class DynamicBrush extends Brush {
 			// Search adjacent spaces
 			for (BlockPos offset : offsets)
 				frontier.add(currentPos.offset(offset));
-			continue;
-		}
+        }
 
 		return affectedPositions;
 	}
