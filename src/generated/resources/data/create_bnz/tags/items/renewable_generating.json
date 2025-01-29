@@ -1,0 +1,32 @@
+{
+  "values": [
+    "minecraft:cobblestone",
+    "minecraft:stone",
+    "minecraft:basalt",
+    "minecraft:obsidian",
+    "minecraft:andesite",
+    "minecraft:granite",
+    "minecraft:diorite",
+    "minecraft:mud",
+    "minecraft:dirt",
+    "minecraft:dirt_path",
+    "minecraft:coarse_dirt",
+    "minecraft:rooted_dirt",
+    "minecraft:mycelium",
+    "minecraft:grass_block",
+    "minecraft:podzol",
+    "minecraft:sand",
+    "minecraft:red_sand",
+    "minecraft:soul_sand",
+    "minecraft:gravel",
+    "minecraft:snow_block",
+    "minecraft:snow",
+    "minecraft:ice",
+    "minecraft:netherrack",
+    "minecraft:moss_block",
+    "minecraft:end_stone",
+    "minecraft:magma_block",
+    "create:limestone",
+    "create:scoria"
+  ]
+}

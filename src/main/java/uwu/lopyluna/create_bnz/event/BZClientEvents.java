@@ -12,13 +12,8 @@ public class BZClientEvents {
 
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event) {
-        if (!isGameActive())
-            return;
-        if (event.phase == TickEvent.Phase.START) {
-            return;
-        }
-
-        BlockZapperRenderHandler.tick();
+        if (isGameActive() && event.phase != TickEvent.Phase.START)
+            BlockZapperRenderHandler.tick();
     }
 
     protected static boolean isGameActive() {

@@ -1,11 +1,8 @@
 package uwu.lopyluna.create_bnz.infrastructure.data;
 
 import com.tterrag.registrate.providers.ProviderType;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 import uwu.lopyluna.create_bnz.CreateBZ;
-import uwu.lopyluna.create_bnz.content.data_recipes.BZProcessingRecipeGen;
 import uwu.lopyluna.create_bnz.registry.BZLangPartial;
 
 import java.util.function.BiConsumer;
@@ -13,14 +10,6 @@ import java.util.function.BiConsumer;
 public class BZDatagen {
 	public static void gatherData(GatherDataEvent event) {
 		addExtraRegistrateData();
-
-		DataGenerator generator = event.getGenerator();
-		PackOutput output = generator.getPackOutput();
-
-		if (event.includeServer()) {
-
-			BZProcessingRecipeGen.registerAll(generator, output);
-		}
 	}
 
 	private static void addExtraRegistrateData() {

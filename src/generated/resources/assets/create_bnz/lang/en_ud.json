@@ -1,8 +1,10 @@
 {
   "create_bnz.handheld_block_zapper.ctrl": "sɹǝıɟıpoW ɹoɟ ",
+  "create_bnz.handheld_block_zapper.failed": "¡uoıʇɔǝןǝs uı pıןɐʌuı sı buıɥʇǝɯoS",
   "create_bnz.handheld_block_zapper.modifiers": ":sɹǝıɟıpoW",
   "create_bnz.handheld_block_zapper.no_modifiers": "˙pǝıןddɐ sɹǝıɟıpoɯ ou ǝʌɐɥ noʎ",
-  "create_bnz.handheld_block_zapper.not_enough_blocks": "¡sʞɔoןq pǝʇɔǝןǝs ɥbnouǝ buıpןoɥ ʇoN",
+  "create_bnz.handheld_block_zapper.not_enough_blocks": "¡sʞɔoןq ɥbnouǝ buıpןoɥ ʇoN",
+  "create_bnz.handheld_block_zapper.too_hard": "¡uoıʇɔǝןǝs uı buoɹʇs ooʇ sı buıɥʇǝɯoS",
   "create_bnz.tooltip.holdForModifiers": " pןoH",
   "item.create_bnz.handheld_block_zapper": "ɹǝddɐZ ʞɔoןᗺ pןǝɥpuɐH",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour1": "˙ɹǝdɐɥs ǝɥʇ ʎq pǝɔɐןd ‾ןɐıɹǝʇɐɯ‾ ǝɥʇ ǝɯoɔǝq ןןıʍ ‾ʞɔoןq pǝʇǝbɹɐ⟘‾",

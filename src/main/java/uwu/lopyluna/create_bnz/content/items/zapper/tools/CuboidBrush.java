@@ -2,7 +2,6 @@ package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -48,8 +47,11 @@ public class CuboidBrush extends ShapedBrush {
 		if (option == PlacementOptions.Merged)
 			return BlockPos.ZERO;
 
-		int offset =
-			option == PlacementOptions.Attached ? face.getAxisDirection() == AxisDirection.NEGATIVE ? 2 : 1 : 0;
+		int offset = switch (option) {
+            case Attached -> face.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 2 : 1;
+            case Inserted -> face.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? -1 : 0;
+            default -> 0;
+        };
 		int x = (param0 + (param0 == 0 ? 0 : offset)) / 2;
 		int y = (param1 + (param1 == 0 ? 0 : offset)) / 2;
 		int z = (param2 + (param2 == 0 ? 0 : offset)) / 2;

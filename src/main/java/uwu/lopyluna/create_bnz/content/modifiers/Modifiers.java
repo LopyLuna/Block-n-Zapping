@@ -11,13 +11,13 @@ import static uwu.lopyluna.create_bnz.registry.BZLangPartial.LANG;
 
 public enum Modifiers {
     EMPTY,
-    CANISTER("Canister", "Adds Block Storage Slots", 4),
-    BODY("Body", "Reinforce to use Stronger Blocks", 4),
-    AMPLIFIER("Amplifier", "Increases Radius", 4), //
+    //CANISTER("Canister", "Adds Block Storage Slots", 4),
+    BODY("Body", "Reinforce to use Stronger Blocks", 4), //
+    AMPLIFIER("Amplifier", "Increases Placement Size", 4), //
     ACCELERATOR("Accelerator", "Reduces Cooldown", 4), //
-    RETRIEVER("Retriever", "Ability to Obtain Blocks", 4),
-    SCOPE("Scope", "Increases Zapper Range", 4), //
-    REINFORCER("Reinforcer", "Reinforce Durability", 4), //Kinda
+    RETRIEVER("Retriever", "Ability to Obtain Blocks", 4), //
+    SCOPE("Scope", "Increases Zapping Range", 4), //
+    REINFORCER("Reinforcer", "Reinforce Durability", 4), //
 
     STASIS("Stasis", "Disallow Block Updates"),
     APPLICATOR("Applicator", "Adds Modifier Slots"),
@@ -70,10 +70,6 @@ public enum Modifiers {
             case 4 -> ModifierTier.ECHO;
             default -> ModifierTier.NONE;
         };
-    }
-
-    public String getId() {
-        return id;
     }
 
     public MutableComponent getDescription() {

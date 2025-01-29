@@ -34,11 +34,14 @@ public final class ZapperRecipeMaker {
                         if (!(itemStack.getItem() instanceof BlockZapperItem)) continue;
                         var nbt = itemStack.getOrCreateTag();
                         nbt.putInt(modifier.baseName, tier.require_level);
+                        nbt.putBoolean("jeiView", true);
                         NBTHelper.writeEnum(nbt, "AppliedModifiers0", modifier);
                     }
                 }
             }
             ItemStack handgun = new ItemStack(BZItems.BLOCK_ZAPPER.get());
+            assert handgun.getTag() != null;
+            handgun.getTag().putBoolean("jeiView", true);
             BlockZapperItem zapperItem = ((BlockZapperItem) handgun.getItem());
             capturedRecipes.add(new ShapedRecipe(zapperRecipe.getId(), zapperRecipe.getGroup(), CraftingBookCategory.MISC, zapperRecipe.getRecipeWidth(), zapperRecipe.getRecipeHeight(),
                     ingredients, zapperItem.setModifierToTier(modifier, tier, handgun)));

@@ -1,6 +1,8 @@
 package uwu.lopyluna.create_bnz.content.items.zapper;
 
-import com.simibubi.create.AllTags;
+import com.google.common.base.Predicates;
+import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ShootableGadgetItemMethods;
 import com.simibubi.create.content.equipment.zapper.ZapperBeamPacket;
@@ -17,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -44,17 +47,21 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import static com.simibubi.create.content.equipment.zapper.PlacementPatterns.Solid;
 import static com.simibubi.create.foundation.item.TooltipHelper.styleFromColor;
 import static net.minecraft.client.gui.screens.Screen.hasControlDown;
 import static net.minecraft.client.gui.screens.Screen.hasShiftDown;
 import static uwu.lopyluna.create_bnz.BZUtils.holdCtrl;
+import static uwu.lopyluna.create_bnz.content.items.zapper.TerrainTools.calculateItemsInInventory;
 import static uwu.lopyluna.create_bnz.content.modifiers.Modifiers.*;
 
 @ParametersAreNonnullByDefault
 public class BlockZapperItem extends ZapperItem {
 	public static List<Modifiers> MODIFIERS = new ArrayList<>();
 	static final String APPLIED_MODIFIER = "AppliedModifiers";
+	static final String APPLIED_UPGRADES = "AppliedUpgrades";
 	static final String MAX_SLOTS = "MaxSlots"; //INT
 	static final String BRUSH_PARAMS = "BrushParams"; //BLOCK POS
 	static final String BRUSH = "Brush"; //ENUM
@@ -66,13 +73,13 @@ public class BlockZapperItem extends ZapperItem {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flagIn) {
 		var nbt = stack.getTag();
 		assert nbt != null;
-
-		if (!hasShiftDown()) {
-			tooltip.add(holdCtrl());
-			if (hasControlDown()) {
+		boolean jeiDisplay = nbt.contains("jeiView");
+		if (!jeiDisplay) tooltip.add(holdCtrl());
+		if (!hasShiftDown() || jeiDisplay) {
+			if (hasControlDown() || jeiDisplay) {
 				int slots = 0;
 				int maxSlots = getMaxModifierSlots(nbt);
 				for (int j = 0; j < maxSlots; j++) {
@@ -84,15 +91,46 @@ public class BlockZapperItem extends ZapperItem {
 						slots++;
 					}
 				}
-				tooltip.add(Component.empty()
-						.append(Component.literal("Modifiers: ").withStyle(ChatFormatting.GRAY))
-						.append(Component.literal(slots + "").withStyle(ChatFormatting.GOLD))
-						.append(Component.literal("/").withStyle(ChatFormatting.GRAY))
-						.append(Component.literal(maxSlots + ".").withStyle(ChatFormatting.DARK_GRAY))
-				);
+				if (!jeiDisplay) {
+					for (int j = 0; j < 3; j++) {
+						Modifiers modifiers = NBTHelper.readEnum(nbt, APPLIED_UPGRADES + j, Modifiers.class);
+						if (modifiers != null && modifiers != EMPTY) {
+                            tooltip.add(modifiers.getName().withStyle(styleFromColor(modifiers.getTierFromModifier(nbt).color.getRGB())));
+							tooltip.add(modifiers.getDescription().withStyle(ChatFormatting.DARK_GRAY));
+							slots++;
+						}
+
+					}
+
+					if (slots == 0) tooltip.add(Component.translatable("create_bnz.handheld_block_zapper.no_modifiers").withStyle(ChatFormatting.GRAY));
+					tooltip.add(Component.empty()
+							.append(Component.translatable("create_bnz.handheld_block_zapper.modifiers").append(" ").withStyle(ChatFormatting.DARK_GRAY))
+							.append(Component.literal(slots + "").withStyle(ChatFormatting.GOLD))
+							.append(Component.literal("/").withStyle(ChatFormatting.GRAY))
+							.append(Component.literal(maxSlots + ".").withStyle(ChatFormatting.DARK_GRAY))
+					);
+				}
 			}
 		}
-		super.appendHoverText(stack, worldIn, tooltip, flagIn);
+		if (!hasShiftDown() && !hasControlDown() && !jeiDisplay) {
+			int amount = nbt.getInt("Amount");
+			int size = nbt.getInt("Size");
+			size = size>1000 ? 0 : size;
+
+			if (stack.hasTag() && stack.getTag().contains("BlockUsed")) {
+				MutableComponent usedBlock = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), stack.getTag().getCompound("BlockUsed")).getBlock().getName();
+				var color = amount >= size ? ChatFormatting.GOLD : ChatFormatting.RED;
+				tooltip.add(Component.empty()
+						.append(Lang.translateDirect("terrainzapper.usingBlock", usedBlock.withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY))
+						.append(Component.empty().append(" : ").withStyle(ChatFormatting.DARK_GRAY))
+						.append(Component.literal(amount + "").withStyle(color))
+						.append(Component.literal("/").withStyle(ChatFormatting.GRAY))
+						.append(Component.literal(size + ".").withStyle(ChatFormatting.DARK_GRAY))
+				);
+			}
+
+
+		}
 	}
 
 	@Override
@@ -116,7 +154,11 @@ public class BlockZapperItem extends ZapperItem {
 	}
 
 	@Override
-	public boolean activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data) {
+	protected boolean activate(Level world, Player player, ItemStack item, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data) {
+		return false;
+	}
+
+	public void activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
 		BlockPos targetPos = raytrace.getBlockPos();
 		List<BlockPos> affectedPositions = new ArrayList<>();
 
@@ -129,9 +171,43 @@ public class BlockZapperItem extends ZapperItem {
 		brush.set(params.getX(), params.getY(), params.getZ());
 		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
 		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
-		PlacementPatterns.applyPattern(affectedPositions, stack);
-		brush.redirectTool(tool).run(world, affectedPositions, stateToUse, data, player);
-		return true;
+		brush.redirectTool(tool).run(world, affectedPositions, stateToUse, data, player, stack, zapperItem, hand, applyPattern(affectedPositions, stack));
+	}
+	public int activateCalculation(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, BlockZapperItem zapperItem) {
+		BlockPos targetPos = raytrace.getBlockPos();
+		List<BlockPos> affectedPositions = new ArrayList<>();
+
+		CompoundTag tag = stack.getOrCreateTag();
+		Brush brush = NBTHelper.readEnum(tag, BRUSH, TerrainBrushes.class).get();
+		BlockPos params = fixSize(NbtUtils.readBlockPos(tag.getCompound(BRUSH_PARAMS)), brush, stack);
+		PlacementOptions option = NBTHelper.readEnum(tag, PLACEMENT, PlacementOptions.class);
+		TerrainTools tool = NBTHelper.readEnum(tag, TOOL, TerrainTools.class);
+
+		brush.set(params.getX(), params.getY(), params.getZ());
+		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
+		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
+		return brush.redirectTool(tool).runCalculate(world, affectedPositions, stateToUse, stack, zapperItem);
+	}
+
+	@SuppressWarnings("all")
+	public static PlacementPatterns applyPattern(List<BlockPos> blocksIn, ItemStack stack) {
+		CompoundTag tag = stack.getTag();
+		PlacementPatterns pattern = !tag.contains("Pattern") ? Solid : PlacementPatterns.valueOf(tag.getString("Pattern"));
+		Predicate<BlockPos> filter = Predicates.alwaysFalse();
+
+		switch (pattern) {
+            case Checkered:
+				filter = pos -> (pos.getX() + pos.getY() + pos.getZ()) % 2 == 0;
+				break;
+			case InverseCheckered:
+				filter = pos -> (pos.getX() + pos.getY() + pos.getZ()) % 2 != 0;
+				break;
+			default:
+				break;
+		}
+
+		blocksIn.removeIf(filter);
+		return pattern;
 	}
 
 	public static void configureSettings(ItemStack stack, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool, PlacementOptions placement) {
@@ -149,15 +225,29 @@ public class BlockZapperItem extends ZapperItem {
 		consumer.accept(SimpleCustomRenderer.create(this, new BlockZapperItemRenderer()));
 	}
 
+	@SuppressWarnings("all")
 	@Override
 	public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
 		super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
+		CompoundTag nbt = pStack.getOrCreateTag();
 		if (BZItems.BLOCK_ZAPPER.isIn(pStack) && pIsSelected) {
-			CompoundTag nbt = pStack.getOrCreateTag();
 
 			MODIFIERS.forEach(modifier -> modifier.update(nbt));
 			int max = getMaxModifierSlots(nbt);
 			if (!nbt.contains(MAX_SLOTS) || (nbt.getInt(MAX_SLOTS) != max)) nbt.putInt(MAX_SLOTS, max);
+		}
+		if (pEntity instanceof Player player) {
+			BlockState stateToUse = Blocks.AIR.defaultBlockState();
+			if (nbt.contains("BlockUsed")) stateToUse = NbtUtils.readBlockState(pLevel.holderLookup(Registries.BLOCK), nbt.getCompound("BlockUsed"));
+			stateToUse = BlockHelper.setZeroAge(stateToUse);
+			Vec3 start = player.position().add(0, player.getEyeHeight(), 0);
+			Vec3 range = player.getLookAngle().scale(getZappingRange(pStack));
+			BlockHitResult raytrace = pLevel.clip(new ClipContext(start, start.add(range), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+
+			int invAmount = calculateItemsInInventory(stateToUse.getBlock(), true, player, nbt.getInt(GENERATOR.baseName) > 0);
+			int selSize = activateCalculation(pLevel, player, pStack, stateToUse, raytrace, (BlockZapperItem)pStack.getItem());
+			if (!nbt.contains("Amount") || (nbt.getInt("Amount") != invAmount)) nbt.putInt("Amount", invAmount);
+			if (!nbt.contains("Size") || (nbt.getInt("Size") != selSize)) nbt.putInt("Size", selSize);
 		}
 	}
 
@@ -182,20 +272,34 @@ public class BlockZapperItem extends ZapperItem {
 		BlockState stateToUse = Blocks.AIR.defaultBlockState();
 		if (nbt.contains("BlockUsed")) stateToUse = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), nbt.getCompound("BlockUsed"));
 		stateToUse = BlockHelper.setZeroAge(stateToUse);
-		CompoundTag data = null;
-		if (AllTags.AllBlockTags.SAFE_NBT.matches(stateToUse) && nbt.contains("BlockData", Tag.TAG_COMPOUND)) data = nbt.getCompound("BlockData");
+		CompoundTag data = nbt.getCompound("BlockData");
+		if (nbt.contains("BlockData", Tag.TAG_COMPOUND)) data = nbt.getCompound("BlockData");
 		Vec3 start = player.position().add(0, player.getEyeHeight(), 0);
 		Vec3 range = player.getLookAngle().scale(getZappingRange(item));
 		BlockHitResult raytrace = level.clip(new ClipContext(start, start.add(range), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
 		Vec3 barrelPos = ShootableGadgetItemMethods.getGunBarrelVec(player, mainHand, new Vec3(.35f, -0.1f, 1));
 
-        if (data != null && activate(level, player, item, stateToUse, raytrace, data)) {
-			ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, getCooldownDelay(item));
-			ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, raytrace.getLocation(), hand, b));
-
+		int amount = nbt.getInt("Amount");
+		int size = nbt.getInt("Size");
+		boolean items = amount >= size;
+		if (level.isClientSide) {
+			if (!player.isShiftKeyDown() && (!items)) {
+				if (size==10001) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.too_hard").withStyle(ChatFormatting.RED), true);
+				else if (size==10002) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.failed").withStyle(ChatFormatting.RED), true);
+				else player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.not_enough_blocks").append(" "+nbt.getInt("Amount")+"/"+nbt.getInt("Size")).withStyle(ChatFormatting.RED), true);
+				AllSoundEvents.DENY.play(level, player, player.blockPosition());
+				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
+			}
+			CreateClient.ZAPPER_RENDER_HANDLER.dontAnimateItem(hand);
 			return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
-
-		} else return super.use(level, player, hand);
+		} else {
+			if (!player.isShiftKeyDown() && items) {
+				activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
+				ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, getCooldownDelay(item));
+				ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, raytrace.getLocation(), hand, b));
+				return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
+			}  else return super.use(level, player, hand);
+		}
 	}
 
 	public ItemStack setModifierToTier(Modifiers modifier, ModifierTier tier, ItemStack pStack) {
@@ -236,6 +340,16 @@ public class BlockZapperItem extends ZapperItem {
 		String id = modifier.baseName;
 		int i = modifier.getLevel(nbt);
 		int max = modifier.maxLevel;
+
+		for (int j = 0; j < 3; j++) {
+			String upgrades = APPLIED_UPGRADES + j;
+			Modifiers modifiers = NBTHelper.readEnum(nbt, upgrades, Modifiers.class);
+			if (modifiers == null || modifiers == EMPTY) {
+				NBTHelper.writeEnum(nbt, upgrades, modifier);
+				break;
+			}
+		}
+
 		int f = 4;
 		if (i < max) {
 			if (i+1 == max) f = 5;
@@ -308,6 +422,17 @@ public class BlockZapperItem extends ZapperItem {
 		};
 	}
 
+	public int getHardnessSupport(ItemStack pStack) {
+		CompoundTag nbt = pStack.getOrCreateTag();
+		return switch (BODY.getLevel(nbt)) {
+			case 1 -> 4;
+			case 2 -> 8;
+			case 3 -> 25;
+			case 4 -> 50;
+			default -> 2;
+		};
+	}
+
 	public int getMaxModifierSlots(CompoundTag nbt) {
 		return nbt.getInt(APPLICATOR.baseName) > 0 ? 5 : 3;
 	}
@@ -320,13 +445,13 @@ public class BlockZapperItem extends ZapperItem {
 	@Override
 	public int getMaxDamage(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		return 1024 * (REINFORCER.getLevel(nbt) + REINFORCER.getLevel(nbt) + 1);
+		return (int)(1024 * ((REINFORCER.getLevel(nbt) * 0.5) + REINFORCER.getLevel(nbt) + 1));
 	}
 
 	@Override
 	public int getZappingRange(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		return 8 * (SCOPE.getLevel(nbt) + 1);
+		return 6 * (SCOPE.getLevel(nbt) + 1);
 	}
 
 	@Override

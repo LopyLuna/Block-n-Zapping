@@ -1,12 +1,8 @@
 package uwu.lopyluna.create_bnz.registry;
 
-import net.minecraft.world.level.ItemLike;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import static uwu.lopyluna.create_bnz.BZUtils.blockZapperLang;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
 public class BZLangPartial {
@@ -28,27 +24,15 @@ public class BZLangPartial {
         consume(consumer, zapper + ".no_modifiers", "You have no modifiers applied.");
         consume(consumer, zapper + ".ctrl", " for Modifiers");
         consume(consumer, "tooltip.holdForModifiers", "Hold ");
-        consume(consumer, zapper + ".not_enough_blocks", "Not holding enough selected blocks!");
+        consume(consumer, zapper + ".not_enough_blocks", "Not holding enough blocks!");
+        consume(consumer, zapper + ".too_hard", "Something is too strong in selection!");
+        consume(consumer, zapper + ".failed", "Something is invalid in selection!");
 
         consume(consumer, "itemGroup.create_bnz.base", "Create: Block n' Zapping", true);
-
     }
 
     private static void consume(BiConsumer<String, String> consumer, String key, String enUS) {
         consume(consumer, key, enUS, false);
-    }
-
-    private static String ItemName(ItemLike item) {
-        return item.asItem().getDescriptionId();
-    }
-    private static void tooltipBehaviour(BiConsumer<String, String> consumer, ItemLike item, String desc, int line) {
-        consume(consumer, ItemName(item) + ".tooltip.behaviour" + line, desc);
-    }
-    private static void tooltipCondition(BiConsumer<String, String> consumer, ItemLike item, String desc, int line) {
-        consume(consumer, ItemName(item) + ".tooltip.condition" + line, desc);
-    }
-    private static void tooltipSummary(BiConsumer<String, String> consumer, ItemLike item, String desc) {
-        consume(consumer, ItemName(item) + ".tooltip.summary", desc);
     }
 
     private static void consume(BiConsumer<String, String> consumer, String type, String key, String enUS) {

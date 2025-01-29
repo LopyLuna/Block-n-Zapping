@@ -1,22 +1,24 @@
 {
   "type": "create_bnz:zapper_recipe",
-  "component": "AMPLIFIER",
-  "tier": "ECHO",
+  "component": "STASIS",
+  "tier": "SPECIAL",
   "key": {
     "Z": {
       "item": "create_bnz:handheld_block_zapper"
     },
-    "A": {
-      "item": "minecraft:turtle_helmet"
+    "S": {
+      "item": "minecraft:sculk_shrieker"
     },
-    "C": {
+    "B": {
+      "item": "minecraft:dragon_breath"
+    },
+    "E": {
       "item": "minecraft:echo_shard"
     }
   },
   "pattern": [
-    "  C",
-    "CZA",
-    "  C"
+    "BZB",
+    "ESE"
   ],
   "result": {
     "item": "create_bnz:handheld_block_zapper"

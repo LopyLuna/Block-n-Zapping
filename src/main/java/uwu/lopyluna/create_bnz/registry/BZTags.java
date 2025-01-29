@@ -146,7 +146,7 @@ public class BZTags {
 	}
 
 	public enum AllItemTags {
-
+		RENEWABLE_GENERATING
 		;
 
 		public final TagKey<Item> tag;

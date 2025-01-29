@@ -1,8 +1,10 @@
 {
   "create_bnz.handheld_block_zapper.ctrl": " for Modifiers",
+  "create_bnz.handheld_block_zapper.failed": "Something is invalid in selection!",
   "create_bnz.handheld_block_zapper.modifiers": "Modifiers:",
   "create_bnz.handheld_block_zapper.no_modifiers": "You have no modifiers applied.",
-  "create_bnz.handheld_block_zapper.not_enough_blocks": "Not holding enough selected blocks!",
+  "create_bnz.handheld_block_zapper.not_enough_blocks": "Not holding enough blocks!",
+  "create_bnz.handheld_block_zapper.too_hard": "Something is too strong in selection!",
   "create_bnz.tooltip.holdForModifiers": "Hold ",
   "item.create_bnz.handheld_block_zapper": "Handheld Block Zapper",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour1": "_Targeted block_ will become the _material_ placed by the shaper.",

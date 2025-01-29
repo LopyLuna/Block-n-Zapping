@@ -1,0 +1,39 @@
+{
+  "type": "create_bnz:zapper_recipe",
+  "component": "GENERATOR",
+  "tier": "SPECIAL",
+  "key": {
+    "Z": {
+      "item": "create_bnz:handheld_block_zapper"
+    },
+    "N": {
+      "item": "minecraft:enchanted_golden_apple"
+    },
+    "C": {
+      "item": "minecraft:recovery_compass"
+    },
+    "W": {
+      "item": "minecraft:water_bucket"
+    },
+    "L": {
+      "item": "minecraft:lava_bucket"
+    },
+    "S": {
+      "item": "create:mechanical_saw"
+    },
+    "D": {
+      "item": "create:mechanical_drill"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    }
+  },
+  "pattern": [
+    "NCN",
+    "SZD",
+    "WTL"
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}

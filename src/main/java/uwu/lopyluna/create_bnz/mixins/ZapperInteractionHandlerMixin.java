@@ -10,7 +10,6 @@ import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem;
 
 @Mixin(value = ZapperInteractionHandler.class, remap = false)
 public class ZapperInteractionHandlerMixin {
-
     @Inject(method = "getRange", at = @At("HEAD"), cancellable = true)
     private static void getRange(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
         if (stack.getItem() instanceof BlockZapperItem blockZapperItem) {

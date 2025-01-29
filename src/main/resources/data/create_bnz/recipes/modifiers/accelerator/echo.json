@@ -1,4 +1,4 @@
-{
+  {
   "type": "create_bnz:zapper_recipe",
   "component": "ACCELERATOR",
   "tier": "ECHO",
@@ -7,7 +7,7 @@
       "item": "create_bnz:handheld_block_zapper"
     },
     "A": {
-      "item": "minecraft:redstone_block"
+      "item": "minecraft:respawn_anchor"
     },
     "C": {
       "item": "minecraft:echo_shard"
