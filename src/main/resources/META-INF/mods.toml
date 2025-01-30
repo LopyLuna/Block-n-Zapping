@@ -9,24 +9,24 @@ displayName="Create: Block n' Zapping"
 logoFile="pack.png"
 authors="LopyLuna"
 description='''
-YIPPEE WASSUP THIS HURTS MY HEAD LMAO
+An addon that Adds back Block Zapper from Old Create Versions & Reimagines it!
 '''
 
-[[dependencies.unify]]
+[[dependencies.create_bnz]]
     modId="forge"
     mandatory=true
     versionRange="[47,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.unify]]
+[[dependencies.create_bnz]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.20.1,1.21)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.unify]]
+[[dependencies.create_bnz]]
     modId="create"
     mandatory=true
     versionRange="[0.5.1.f,)"
