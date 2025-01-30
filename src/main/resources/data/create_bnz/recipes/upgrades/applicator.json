@@ -1,6 +1,6 @@
 {
   "type": "create_bnz:zapper_recipe",
-  "component": "STASIS",
+  "component": "APPLICATOR",
   "tier": "SPECIAL",
   "key": {
     "Z": {

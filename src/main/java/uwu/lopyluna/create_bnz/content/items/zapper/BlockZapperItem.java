@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -60,6 +61,7 @@ import static uwu.lopyluna.create_bnz.content.modifiers.Modifiers.*;
 @ParametersAreNonnullByDefault
 public class BlockZapperItem extends ZapperItem {
 	public static List<Modifiers> MODIFIERS = new ArrayList<>();
+	public static List<ModifierTier> TIERS = new ArrayList<>();
 	static final String APPLIED_MODIFIER = "AppliedModifiers";
 	static final String APPLIED_UPGRADES = "AppliedUpgrades";
 	static final String MAX_SLOTS = "MaxSlots"; //INT
@@ -97,9 +99,7 @@ public class BlockZapperItem extends ZapperItem {
 						if (modifiers != null && modifiers != EMPTY) {
                             tooltip.add(modifiers.getName().withStyle(styleFromColor(modifiers.getTierFromModifier(nbt).color.getRGB())));
 							tooltip.add(modifiers.getDescription().withStyle(ChatFormatting.DARK_GRAY));
-							slots++;
 						}
-
 					}
 
 					if (slots == 0) tooltip.add(Component.translatable("create_bnz.handheld_block_zapper.no_modifiers").withStyle(ChatFormatting.GRAY));
@@ -115,7 +115,7 @@ public class BlockZapperItem extends ZapperItem {
 		if (!hasShiftDown() && !hasControlDown() && !jeiDisplay) {
 			int amount = nbt.getInt("Amount");
 			int size = nbt.getInt("Size");
-			size = size>1000 ? 0 : size;
+			size = size==999999 ? 0 : size;
 
 			if (stack.hasTag() && stack.getTag().contains("BlockUsed")) {
 				MutableComponent usedBlock = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), stack.getTag().getCompound("BlockUsed")).getBlock().getName();
@@ -158,20 +158,22 @@ public class BlockZapperItem extends ZapperItem {
 		return false;
 	}
 
-	public void activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
+	public float activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
 		BlockPos targetPos = raytrace.getBlockPos();
 		List<BlockPos> affectedPositions = new ArrayList<>();
 
 		CompoundTag tag = stack.getOrCreateTag();
 		Brush brush = NBTHelper.readEnum(tag, BRUSH, TerrainBrushes.class).get();
 		BlockPos params = fixSize(NbtUtils.readBlockPos(tag.getCompound(BRUSH_PARAMS)), brush, stack);
+		float multiplier = sizeMultiplier(params, brush, stack);
+
 		PlacementOptions option = NBTHelper.readEnum(tag, PLACEMENT, PlacementOptions.class);
 		TerrainTools tool = NBTHelper.readEnum(tag, TOOL, TerrainTools.class);
-
 		brush.set(params.getX(), params.getY(), params.getZ());
 		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
 		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
 		brush.redirectTool(tool).run(world, affectedPositions, stateToUse, data, player, stack, zapperItem, hand, applyPattern(affectedPositions, stack));
+		return multiplier;
 	}
 	public int activateCalculation(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, BlockZapperItem zapperItem) {
 		BlockPos targetPos = raytrace.getBlockPos();
@@ -222,6 +224,7 @@ public class BlockZapperItem extends ZapperItem {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		BlockZapperItemRenderer.renderModels();
 		consumer.accept(SimpleCustomRenderer.create(this, new BlockZapperItemRenderer()));
 	}
 
@@ -278,24 +281,30 @@ public class BlockZapperItem extends ZapperItem {
 		Vec3 range = player.getLookAngle().scale(getZappingRange(item));
 		BlockHitResult raytrace = level.clip(new ClipContext(start, start.add(range), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
 		Vec3 barrelPos = ShootableGadgetItemMethods.getGunBarrelVec(player, mainHand, new Vec3(.35f, -0.1f, 1));
+		BlockPos lookingPos = raytrace.getBlockPos();
 
 		int amount = nbt.getInt("Amount");
 		int size = nbt.getInt("Size");
-		boolean items = amount >= size;
+		boolean items = ((amount >= size || player.isCreative()) && size != 0) || (size == 999999);
+		boolean lookingAtBlock = level.getWorldBorder().isWithinBounds(lookingPos) && raytrace.getType() != HitResult.Type.MISS;
 		if (level.isClientSide) {
-			if (!player.isShiftKeyDown() && (!items)) {
-				if (size==10001) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.too_hard").withStyle(ChatFormatting.RED), true);
-				else if (size==10002) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.failed").withStyle(ChatFormatting.RED), true);
-				else player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.not_enough_blocks").append(" "+nbt.getInt("Amount")+"/"+nbt.getInt("Size")).withStyle(ChatFormatting.RED), true);
+			if (!player.isShiftKeyDown() && (!items || !lookingAtBlock)) {
+				//if (size==10001) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.too_hard").withStyle(ChatFormatting.RED), true)
+				//else if (size==10002) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.failed").withStyle(ChatFormatting.RED), true)
+				if (size!=0 && size!=999999) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.not_enough_blocks").append(" "+nbt.getInt("Amount")+"/"+nbt.getInt("Size")).withStyle(ChatFormatting.RED), true);
 				AllSoundEvents.DENY.play(level, player, player.blockPosition());
 				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
 			}
 			CreateClient.ZAPPER_RENDER_HANDLER.dontAnimateItem(hand);
 			return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
 		} else {
-			if (!player.isShiftKeyDown() && items) {
-				activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
-				ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, getCooldownDelay(item));
+			if (!player.isShiftKeyDown() && (!items || !lookingAtBlock)) {
+				player.getCooldowns().addCooldown(item.getItem(), 10);
+				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
+			} else if (!player.isShiftKeyDown() && items && lookingAtBlock) {
+				float multiplier = activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
+				int cooldown = (int) (multiplier * getCooldownDelay(item));
+				ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, Math.max(cooldown, 5));
 				ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, raytrace.getLocation(), hand, b));
 				return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
 			}  else return super.use(level, player, hand);
@@ -374,6 +383,21 @@ public class BlockZapperItem extends ZapperItem {
 		return new BlockPos(x, y, z);
 	}
 
+	public float sizeMultiplier(BlockPos params, Brush brush, ItemStack stack) {
+		float size = getMaxSize(stack);
+		float radius = getMaxRadius(stack);
+		float radiusSize = (int) (radius * 1.25);
+		float max = 1;
+		if (brush instanceof CuboidBrush) max = size;
+		if (brush instanceof SphereBrush) max = radiusSize;
+		if (brush instanceof CylinderBrush) max = radius;
+		if (brush instanceof DynamicBrush) max = radiusSize;
+		float x = params.getX();
+		float y = params.getY();
+		float z = params.getZ();
+		return (x*y*z) / (max*max*max);
+	}
+
 	public int indexMax(int index, Brush brush, ItemStack stack) {
 		int size = getMaxSize(stack);
 		int radius = getMaxRadius(stack);
@@ -445,7 +469,9 @@ public class BlockZapperItem extends ZapperItem {
 	@Override
 	public int getMaxDamage(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		return (int)(1024 * ((REINFORCER.getLevel(nbt) * 0.5) + REINFORCER.getLevel(nbt) + 1));
+		double level = REINFORCER.getLevel(nbt);
+		double multiplier = level==0 ? 1 : (level * 0.5) + level;
+		return (int)(1536 * multiplier);
 	}
 
 	@Override

@@ -1,5 +1,32 @@
-// 1.20.1	2025-01-28T15:18:41.4916448	Registrate Provider for create_bnz [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-2bffdc13610443611be776ff663b06c9673f4136 assets/create_bnz/lang/en_ud.json
-97bdd53d0c86b2daa84eb6a750b562c37728febf assets/create_bnz/lang/en_us.json
+// 1.20.1	2025-01-28T20:38:47.8060966	Registrate Provider for create_bnz [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+30f820c894fa55ea875ca0bb20a10c714531d9a3 assets/create_bnz/lang/en_ud.json
+3e7a9981b43b7e0180da64b05cd9ce3d94728d7c assets/create_bnz/lang/en_us.json
 4ae9ed667645f65adeaf054ee2b67eb6fd5ae1ba assets/create_bnz/models/item/handheld_block_zapper.json
+251e38f00650dc36f4812124dddabecbd5481269 assets/create_bnz/models/item/handheld_block_zapper/augments/brass/accelerator.json
+9e3ec6da74d6b370a4c8327fc6218c07c7000320 assets/create_bnz/models/item/handheld_block_zapper/augments/brass/amplifier.json
+f263c9496865e238931c47380c228039d3b6f015 assets/create_bnz/models/item/handheld_block_zapper/augments/brass/body.json
+fe4a43284abcb439100575356bde8ca9730077aa assets/create_bnz/models/item/handheld_block_zapper/augments/brass/reinforcer.json
+25438bd2bf4ed99b936302a2987228d66e973968 assets/create_bnz/models/item/handheld_block_zapper/augments/brass/retriever.json
+77a28490f492b8cb9fa3f0e968dec81dfcf3e2ad assets/create_bnz/models/item/handheld_block_zapper/augments/brass/scope.json
+217db6d65e521ae60c38e82bde4e919b400cb5ad assets/create_bnz/models/item/handheld_block_zapper/augments/echo/accelerator.json
+594339afe774106d16534dd17ae09fa8dc307e5a assets/create_bnz/models/item/handheld_block_zapper/augments/echo/amplifier.json
+8907f175a87105166f91fc0faac61eadcb13a202 assets/create_bnz/models/item/handheld_block_zapper/augments/echo/body.json
+1cc14c22a5971bd92452114fc6406d22c9f0cc8c assets/create_bnz/models/item/handheld_block_zapper/augments/echo/reinforcer.json
+66bc51e4a5565ffa11d7b84c03ffe2c69e73a11b assets/create_bnz/models/item/handheld_block_zapper/augments/echo/retriever.json
+43e424d28896acf2b1bc1a8038c00831f5a17921 assets/create_bnz/models/item/handheld_block_zapper/augments/echo/scope.json
+978e84dfc8a87b82917f086c2c86a25e4a954a76 assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/accelerator.json
+f1b25420fe3484195f51bc562e25e66fa6c115b4 assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/amplifier.json
+1141115675891e0bebffb0c74682929e13f7ce5c assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/body.json
+56f5660610027b9276ed48620013ee46ef6217b1 assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/reinforcer.json
+bb5ea2abd92ce9e04ff9796d7458f38f96d8e2d1 assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/retriever.json
+b55ee034b3a31b6a43b443b4318e8e9a9957361b assets/create_bnz/models/item/handheld_block_zapper/augments/obsidian/scope.json
+1ec6a6dff1e8d662c03efbf6e004dc903b538729 assets/create_bnz/models/item/handheld_block_zapper/augments/rose/accelerator.json
+52078c38a44a5fd7aedf83768548df13bffeccb8 assets/create_bnz/models/item/handheld_block_zapper/augments/rose/amplifier.json
+e2fb8fad34b89f22d5a411c7a391c11ba3cf02cc assets/create_bnz/models/item/handheld_block_zapper/augments/rose/body.json
+86b8696e2164d58bc6ac002462afcdeb4be943c5 assets/create_bnz/models/item/handheld_block_zapper/augments/rose/reinforcer.json
+608873678594e95d38ed02381a2d2272902540e7 assets/create_bnz/models/item/handheld_block_zapper/augments/rose/retriever.json
+06e64443994bac460c9f640eb5f7b3f1b1687ead assets/create_bnz/models/item/handheld_block_zapper/augments/rose/scope.json
+c4b24cfb610dd84e0d2933ff86debee00de7b8b1 assets/create_bnz/models/item/handheld_block_zapper/augments/special/applicator.json
+be6e1ba22e22eb7d9cb95d05f3c70a1d9e51d49f assets/create_bnz/models/item/handheld_block_zapper/augments/special/generator.json
+980a6e365ba2dd6aa96fbc8628848d4316f2c32c assets/create_bnz/models/item/handheld_block_zapper/augments/special/stasis.json
 96f8f5cc7ab93227219fea611f0c0ec73ac79cf1 data/create_bnz/tags/items/renewable_generating.json

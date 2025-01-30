@@ -1,0 +1,7 @@
+{
+	"textures": {
+		"0": "create_bnz:item/block_zapper_mesh",
+		"1": "minecraft:block/smooth_stone_slab_side",
+		"particle": "minecraft:block/obsidian"
+	}
+}

@@ -106,7 +106,7 @@ public enum TerrainTools {
 		int size = 0;
         switch (this) {
 			case Clear:
-				break;
+				return 999999;
 			case Place:
 				for (var p : targetPositions)
 					if (meetRequirements(world, paintedState, p, world.getBlockState(p), stack, zapperItem) == 0)
@@ -162,7 +162,9 @@ public enum TerrainTools {
 		boolean stasis = STASIS.getLevel(nbt) > 0;
 		Block paintBlock = paintState.getBlock();
 		boolean creative = player.isCreative();
-		if (!creative && !paintState.isAir()) calculateItemsInInventory(paintBlock, false, player, nbt.getInt(GENERATOR.baseName) > 0);
+		boolean hasGenerator = GENERATOR.getLevel(nbt) > 0;
+		if (!creative && !paintState.isAir() && !hasItemInInventory(paintBlock, player, hasGenerator)) return;
+		if (!creative && !paintState.isAir()) calculateItemsInInventory(paintBlock, false, player, hasGenerator);
 
 		if (retTier > 0) dropResources(replaceState, pLevel, replacePos, replaceState.hasBlockEntity() ? pLevel.getBlockEntity(replacePos) : null, player, stack, retTier);
 		paintBlock.setPlacedBy(pLevel, replacePos, paintState, player, stack);
@@ -173,22 +175,32 @@ public enum TerrainTools {
 		if (!creative) stack.hurtAndBreak(2, player, b -> b.broadcastBreakEvent(hand));
 	}
 
+	public static boolean hasItemInInventory(Block paintBlock, Player player, boolean generator) {
+		var inv = player.getInventory();
+		int size = inv.getContainerSize();
+		if (RENEWABLE_GENERATING.matches(paintBlock.asItem()) && generator) return true;
+		else for (int slot = 0; slot < size; slot++) {
+			var item = inv.getItem(slot);
+			if (item.isEmpty()) continue;
+			if (item.is(paintBlock.asItem())) return true;
+		}
+		return false;
+	}
+
 	public static int calculateItemsInInventory(Block paintBlock, boolean calculate, Player player, boolean generator) {
 		int amount = 0;
 		var inv = player.getInventory();
 		int size = inv.getContainerSize();
-		if (RENEWABLE_GENERATING.matches(paintBlock.asItem()) && generator) amount = size * 64;
-		else {
-			for (int slot = 0; slot < size; slot++) {
-				var item = inv.getItem(slot);
-				if (item.isEmpty())
-					continue;
-				if (item.is(paintBlock.asItem())) {
-					if (!calculate) {
-						item.shrink(1);
-						return 1;
-					} else amount = amount + item.getCount();
-				}
+		if (RENEWABLE_GENERATING.matches(paintBlock.asItem()) && generator) amount = size * 128;
+		else for (int slot = 0; slot < size; slot++) {
+			var item = inv.getItem(slot);
+			if (item.isEmpty())
+				continue;
+			if (item.is(paintBlock.asItem())) {
+				if (!calculate) {	
+					item.shrink(1);
+					return 1;
+				} else amount = amount + item.getCount();
 			}
 		}
 		return amount;
@@ -200,11 +212,11 @@ public enum TerrainTools {
 	public static int meetRequirements(Level pLevel, BlockState paintState, BlockPos replacePos, BlockState replaceState, ItemStack stack, BlockZapperItem zapperItem) {
 		if (paintState == replaceState)
 			return 8;
-		if (replaceState.getBlock().defaultDestroyTime() > zapperItem.getHardnessSupport(stack))
+		if (replaceState.getBlock().defaultDestroyTime() > zapperItem.getHardnessSupport(stack) && !replaceState.isAir())
 			return 6;
-		if (!paintState.canSurvive(pLevel, replacePos))
-			return 4;
 		if (blacklist(replaceState))
+			return 4;
+		if (!paintState.canSurvive(pLevel, replacePos))
 			return 4;
         return pLevel.getWorldBorder().isWithinBounds(replacePos) ? 0 : 4;
     }

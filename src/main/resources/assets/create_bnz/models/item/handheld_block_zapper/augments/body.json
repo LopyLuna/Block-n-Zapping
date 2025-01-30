@@ -1,0 +1,99 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create_bnz:item/block_zapper_mesh",
+		"1": "minecraft:block/smooth_stone_slab_side",
+		"particle": "minecraft:block/obsidian"
+	},
+	"elements": [
+		{
+			"name": "Connector",
+			"from": [6.5, 6.125, 0],
+			"to": [9.5, 7.125, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0.125, 0]},
+			"faces": {
+				"north": {"uv": [3, 9, 4, 12], "rotation": 90, "texture": "#0"},
+				"east": {"uv": [5, 8, 16, 9], "texture": "#0"},
+				"south": {"uv": [15, 9, 16, 12], "rotation": 90, "texture": "#0"},
+				"west": {"uv": [5, 12, 16, 13], "texture": "#0"},
+				"up": {"uv": [3, 9, 14, 12], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [5, 9, 16, 12], "rotation": 90, "texture": "#0"}
+			}
+		},
+		{
+			"name": "Connector",
+			"from": [6.5, 4.125, 0],
+			"to": [9.5, 5.125, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0.125, 0]},
+			"faces": {
+				"north": {"uv": [3, 9, 4, 12], "rotation": 90, "texture": "#0"},
+				"east": {"uv": [5, 8, 16, 9], "texture": "#0"},
+				"south": {"uv": [15, 9, 16, 12], "rotation": 90, "texture": "#0"},
+				"west": {"uv": [5, 12, 16, 13], "texture": "#0"},
+				"up": {"uv": [3, 9, 14, 12], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [5, 9, 16, 12], "rotation": 90, "texture": "#0"}
+			}
+		},
+		{
+			"name": "Rod Back Cap",
+			"from": [6, 4.5, 9.125],
+			"to": [10, 6.5, 11.0625],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5.5, 8.125]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 2], "texture": "#0"},
+				"east": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"south": {"uv": [0, 0, 4, 1], "texture": "#0"},
+				"west": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"up": {"uv": [0, 0, 4, 2], "texture": "#0"},
+				"down": {"uv": [0, 0, 4, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Rod Back Cap",
+			"from": [6.5, 3.5, 14],
+			"to": [10.5, 7.5, 15],
+			"rotation": {"angle": -45, "axis": "z", "origin": [8, 6, 8]},
+			"faces": {
+				"north": {"uv": [12, 4, 16, 8], "texture": "#0"},
+				"east": {"uv": [12, 4, 13, 8], "texture": "#0"},
+				"south": {"uv": [16, 4, 12, 8], "texture": "#0"},
+				"west": {"uv": [15, 4, 16, 8], "texture": "#0"},
+				"up": {"uv": [16, 4, 12, 5], "texture": "#0"},
+				"down": {"uv": [16, 7, 12, 8], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [1, 0, 0],
+			"translation": [0, 4, -2.5],
+			"scale": [0.8, 0.8, 0.8]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [1, 0, 0],
+			"translation": [0, 4, -2.5],
+			"scale": [0.8, 0.8, 0.8]
+		},
+		"firstperson_righthand": {
+			"rotation": [10, 0, 10],
+			"translation": [1, 4, 1]
+		},
+		"firstperson_lefthand": {
+			"rotation": [10, 0, 10],
+			"translation": [1, 4, 1]
+		},
+		"ground": {
+			"rotation": [0, 0, 90],
+			"translation": [-2.25, -1, -0.75],
+			"scale": [0.75, 0.75, 0.75]
+		},
+		"gui": {
+			"rotation": [30, 45, 0],
+			"translation": [-0.5, 3.5, 0]
+		},
+		"fixed": {
+			"rotation": [0, 90, 0],
+			"translation": [-1.25, 4.25, -1]
+		}
+	}
+}

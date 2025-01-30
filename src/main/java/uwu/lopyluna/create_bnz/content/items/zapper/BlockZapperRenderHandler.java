@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
 import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
@@ -71,6 +72,7 @@ public class BlockZapperRenderHandler {
 			renderedPositions = null;
 			return;
 		}
+		Level level = player.level();
 		BlockZapperItem zapperItem = (BlockZapperItem) held.getItem();
 
 		Brush brush = NBTHelper.readEnum(tag, "Brush", TerrainBrushes.class).get();
@@ -81,14 +83,14 @@ public class BlockZapperRenderHandler {
 
 		Vec3 start = player.position().add(0, player.getEyeHeight(), 0);
 		Vec3 range = player.getLookAngle().scale(zapperItem.getZappingRange(held));
-		BlockHitResult raytrace = player.level().clip(new ClipContext(start, start.add(range), Block.OUTLINE, Fluid.NONE, player));
+		BlockHitResult raytrace = level.clip(new ClipContext(start, start.add(range), Block.OUTLINE, Fluid.NONE, player));
 		if (raytrace.getType() == Type.MISS) {
 			renderedPositions = null;
 			return;
 		}
 
 		BlockPos pos = raytrace.getBlockPos().offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), placement));
-		renderedPositions = () -> brush.addToGlobalPositions(player.level(), pos, raytrace.getDirection(), new ArrayList<>(), tool);
+		renderedPositions = () -> brush.addToGlobalPositions(level, pos, raytrace.getDirection(), new ArrayList<>(), tool);
 	}
 
 }

@@ -1,0 +1,38 @@
+{
+  "type": "create:mechanical_crafting",
+  "acceptMirrored": true,
+  "key": {
+    "Z": {
+      "tag": "forge:ingots/zinc"
+    },
+    "N": {
+      "tag": "forge:ingots/netherite"
+    },
+    "I": {
+      "tag": "forge:ingots/iron"
+    },
+    "P": {
+      "tag": "forge:gems/prismarine"
+    },
+    "O": {
+      "tag": "forge:dusts/obsidian"
+    },
+    "S": {
+      "tag": "forge:nether_stars"
+    },
+    "M": {
+      "item": "create:precision_mechanism"
+    },
+    "C": {
+      "item": "create:smart_chute"
+    }
+  },
+  "pattern": [
+    "ZOCNNN",
+    " MSPPP",
+    "III   "
+  ],
+  "result": {
+    "item": "create_bnz:handheld_block_zapper"
+  }
+}
