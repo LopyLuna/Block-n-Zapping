@@ -5,9 +5,7 @@ import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -237,52 +235,33 @@ public enum TerrainTools {
 		}
 	}
 
-	static int cTick = 0;
-	public static void itemTickClient(Level pLevel, Player player) {
-		cTick = ++cTick % 2;
-		if (cTick==1) {
-			Vec3 center = getCenterPos(player);
-			AABB bb = new AABB(center, center).inflate(32);
-
-			for (ItemEntity entity : pLevel.getEntitiesOfClass(ItemEntity.class, bb)) {
-				if (entity == null || entity.isRemoved() || !entity.getTags().contains("sendToNearestPlayer")) continue;
-				Vec3 diff = getCenterPos(entity).subtract(center);
-				double distance = diff.length();
-				if (distance > 32) continue;
-
-				var pos = entity.position();
-				if (pLevel.random.nextFloat() < (Mth.clamp(entity.getItem().getCount() - 10, 5, 100) / 64f)) {
-					Vec3 pPos = VecHelper.offsetRandomly(pos, pLevel.random, .5f);
-					pLevel.addParticle(ParticleTypes.END_ROD, pPos.x, pos.y, pPos.z, 0, -.1f, 0);
-				}
-			}
-		}
-	}
-
 	static int tick = 0;
 	public static void itemTransferTick(Level pLevel, Player player) {
 		tick = ++tick % 2;
 		if (tick==1) {
 			Vec3 center = getCenterPos(player);
-			AABB bb = new AABB(center, center).inflate(32);
+			AABB bb = new AABB(center, center).inflate(64);
 
 			for (ItemEntity entity : pLevel.getEntitiesOfClass(ItemEntity.class, bb)) {
 				if (entity == null || entity.isRemoved() || !entity.getTags().contains("sendToNearestPlayer")) continue;
+				boolean fast = entity.getTags().contains("sendToNearestPlayerInstant");
 				Vec3 diff = getCenterPos(entity).subtract(center);
 				double distance = diff.length();
-				if (distance > 32) continue;
+				int range = fast ? 64 : 32;
+				if (distance > range) continue;
 
-				Vec3 pushVec = diff.normalize().scale((32 - distance) * -1);
+				Vec3 pushVec = diff.normalize().scale((range - distance) * -1);
 				float forceFactor = 1 / 128f;
-				Vec3 force = pushVec.scale(forceFactor * 0.5);
+				Vec3 force = pushVec.scale(forceFactor * (fast ? 1.0 : 0.5));
 
 				entity.push(force.x, force.y, force.z);
 				entity.fallDistance = 0;
 				entity.hurtMarked = true;
 
+				float limit = fast ? 4.0f : 2.0f;
 				Vec3 currentMovement = entity.getDeltaMovement();
-				if (currentMovement.length() > 2.0) {
-					Vec3 limitedMovement = currentMovement.normalize().scale(2.0);
+				if (currentMovement.length() > limit) {
+					Vec3 limitedMovement = currentMovement.normalize().scale(limit);
 					entity.setDeltaMovement(limitedMovement);
 				}
 			}
@@ -298,6 +277,7 @@ public enum TerrainTools {
 		if (retrieverLevel >= 2) item.addTag("sendToNearestPlayer");
 		if (retrieverLevel == 3) item.setNoGravity(true);
 		if (retrieverLevel >= 3) item.setNoPickUpDelay();
+		if (retrieverLevel >= 4) item.addTag("sendToNearestPlayerInstant");
 		popResource(pLevel, () -> item, pStack);
 	}
 

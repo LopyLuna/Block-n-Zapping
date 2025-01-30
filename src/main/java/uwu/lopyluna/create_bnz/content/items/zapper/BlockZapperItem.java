@@ -291,7 +291,7 @@ public class BlockZapperItem extends ZapperItem {
 			if (!player.isShiftKeyDown() && (!items || !lookingAtBlock)) {
 				//if (size==10001) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.too_hard").withStyle(ChatFormatting.RED), true)
 				//else if (size==10002) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.failed").withStyle(ChatFormatting.RED), true)
-				if (size!=0 && size!=999999) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.not_enough_blocks").append(" "+nbt.getInt("Amount")+"/"+nbt.getInt("Size")).withStyle(ChatFormatting.RED), true);
+				if (size!=0 && size!=999999 && lookingAtBlock) player.displayClientMessage(Component.translatable("create_bnz.handheld_block_zapper.not_enough_blocks").append(" "+nbt.getInt("Amount")+"/"+nbt.getInt("Size")).withStyle(ChatFormatting.RED), true);
 				AllSoundEvents.DENY.play(level, player, player.blockPosition());
 				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
 			}
