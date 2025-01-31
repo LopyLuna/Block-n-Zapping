@@ -8,10 +8,13 @@ import com.simibubi.create.content.equipment.zapper.ShootableGadgetItemMethods;
 import com.simibubi.create.content.equipment.zapper.ZapperBeamPacket;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
 import com.simibubi.create.foundation.gui.ScreenOpener;
-import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.NBTHelper;
+
+import io.github.fabricators_of_create.porting_lib.item.DamageableItem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -28,6 +31,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Vanishable;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -35,9 +39,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import uwu.lopyluna.create_bnz.content.items.zapper.tools.*;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
@@ -47,7 +48,6 @@ import uwu.lopyluna.create_bnz.registry.BZItems;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static com.simibubi.create.content.equipment.zapper.PlacementPatterns.Solid;
@@ -59,7 +59,7 @@ import static uwu.lopyluna.create_bnz.content.items.zapper.TerrainTools.calculat
 import static uwu.lopyluna.create_bnz.content.modifiers.Modifiers.*;
 
 @ParametersAreNonnullByDefault
-public class BlockZapperItem extends ZapperItem {
+public class BlockZapperItem extends ZapperItem implements DamageableItem, Vanishable {
 	public static List<Modifiers> MODIFIERS = new ArrayList<>();
 	public static List<ModifierTier> TIERS = new ArrayList<>();
 	static final String APPLIED_MODIFIER = "AppliedModifiers";
@@ -71,7 +71,7 @@ public class BlockZapperItem extends ZapperItem {
 	static final String PLACEMENT = "Placement"; //ENUM
 
 	public BlockZapperItem(Properties properties) {
-		super(properties);
+		super(properties.defaultDurability(1536));
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class BlockZapperItem extends ZapperItem {
 	}
 
 	@Override
-	@OnlyIn(value = Dist.CLIENT)
+	@Environment(value = EnvType.CLIENT)
 	public void openHandgunGUI(ItemStack item, InteractionHand hand) {
 		ScreenOpener.open(new BlockZapperScreen(item, hand));
 	}
@@ -158,7 +158,7 @@ public class BlockZapperItem extends ZapperItem {
 		return false;
 	}
 
-	public float activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
+	public float activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand, int amount) {
 		BlockPos targetPos = raytrace.getBlockPos();
 		List<BlockPos> affectedPositions = new ArrayList<>();
 
@@ -219,13 +219,6 @@ public class BlockZapperItem extends ZapperItem {
 		nbt.put(BRUSH_PARAMS, NbtUtils.writeBlockPos(new BlockPos(brushParamX, brushParamY, brushParamZ)));
 		NBTHelper.writeEnum(nbt, TOOL, tool);
 		NBTHelper.writeEnum(nbt, PLACEMENT, placement);
-	}
-
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-		BlockZapperItemRenderer.renderModels();
-		consumer.accept(SimpleCustomRenderer.create(this, new BlockZapperItemRenderer()));
 	}
 
 	@SuppressWarnings("all")
@@ -302,7 +295,8 @@ public class BlockZapperItem extends ZapperItem {
 				player.getCooldowns().addCooldown(item.getItem(), 10);
 				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
 			} else if (!player.isShiftKeyDown() && items && lookingAtBlock) {
-				float multiplier = activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
+				amount = amount==999999?0:amount;
+				float multiplier = activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand, amount);
 				int cooldown = (int) (multiplier * getCooldownDelay(item));
 				ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, Math.max(cooldown, 5));
 				ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, raytrace.getLocation(), hand, b));
@@ -410,21 +404,6 @@ public class BlockZapperItem extends ZapperItem {
 		return Math.min(index, max);
 	}
 
-	public int[] fixSize(int[] params, Brush brush, ItemStack stack) {
-		int size = getMaxSize(stack);
-		int radius = getMaxRadius(stack);
-		int radiusSize = (int) (radius * 1.25);
-		int max = 1;
-		if (brush instanceof CuboidBrush) max = size;
-		if (brush instanceof SphereBrush) max = radiusSize;
-		if (brush instanceof CylinderBrush) max = radius;
-		if (brush instanceof DynamicBrush) max = radiusSize;
-		int x = Math.min(params[0], max);
-		int y = Math.min(params[1], max);
-		int z = Math.min(params[2], max);
-		return new int[] { x, y, z };
-	}
-
 	public int getMaxSize(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		return switch (AMPLIFIER.getLevel(nbt)) {
@@ -459,11 +438,6 @@ public class BlockZapperItem extends ZapperItem {
 
 	public int getMaxModifierSlots(CompoundTag nbt) {
 		return nbt.getInt(APPLICATOR.baseName) > 0 ? 5 : 3;
-	}
-
-	@Override
-	public boolean isDamageable(ItemStack pStack) {
-		return true;
 	}
 
 	@Override

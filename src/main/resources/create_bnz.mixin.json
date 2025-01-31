@@ -5,14 +5,15 @@
   "priority": 1500,
   "package": "uwu.lopyluna.create_bnz.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "create_bnz.refmap.json",
   "mixins": [
+    "PlayerMixin",
     "ZapperInteractionHandlerMixin",
-    "ZapperInteractionHandlerSelectMixin"
+    "ZapperInteractionHandlerSelectMixin",
+    "accessor.DropExperienceBlockAccessor"
+  ],
+  "client": [
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "client": [
-  ]
+  }
 }

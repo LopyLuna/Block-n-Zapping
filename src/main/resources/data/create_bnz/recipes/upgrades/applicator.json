@@ -7,7 +7,7 @@
       "item": "create_bnz:handheld_block_zapper"
     },
     "B": {
-      "tag": "forge:storage_blocks/brass"
+      "tag": "c:brass_blocks"
     },
     "M": {
       "item": "create:precision_mechanism"

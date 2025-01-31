@@ -10,7 +10,7 @@
       "item": "create:experience_nugget"
     },
     "C": {
-      "tag": "forge:ingots/brass"
+      "tag": "c:brass_ingots"
     }
   },
   "pattern": [

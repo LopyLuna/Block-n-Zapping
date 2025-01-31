@@ -1,22 +1,23 @@
 package uwu.lopyluna.create_bnz.event;
 
+
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperRenderHandler;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
 public class BZClientEvents {
 
-    @SubscribeEvent
-    public static void onTick(TickEvent.ClientTickEvent event) {
-        if (isGameActive() && event.phase != TickEvent.Phase.START)
-            BlockZapperRenderHandler.tick();
+	public static void onTick(Minecraft client) {
+        if (isGameActive()) BlockZapperRenderHandler.tick();
     }
 
+
+	public static void register() {
+		ClientTickEvents.END_CLIENT_TICK.register(BZClientEvents::onTick);
+	}
+
+
     protected static boolean isGameActive() {
-        return !(Minecraft.getInstance().level == null || Minecraft.getInstance().player == null);
+		return !(Minecraft.getInstance().level == null || Minecraft.getInstance().player == null);
     }
 }

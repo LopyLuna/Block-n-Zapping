@@ -7,10 +7,10 @@
       "item": "create_bnz:handheld_block_zapper"
     },
     "A": {
-      "item": "minecraft:iron_ingot"
+      "tag": "c:iron_ingots"
     },
     "C": {
-      "tag": "forge:ingots/brass"
+      "tag": "c:brass_ingots"
     }
   },
   "pattern": [

@@ -34,8 +34,7 @@ public class BlockZapperScreen extends ZapperScreen {
 
     protected final Component placementSection = Lang.translateDirect("gui.terrainzapper.placement");
 	protected final Component toolSection = Lang.translateDirect("gui.terrainzapper.tool");
-	protected final List<Component> brushOptions =
-		Lang.translatedOptions("gui.terrainzapper.brush", "cuboid", "sphere", "cylinder", "surface", "cluster");
+	protected final List<Component> brushOptions = Lang.translatedOptions("gui.terrainzapper.brush", "cuboid", "sphere", "cylinder", "surface", "cluster");
 
 	protected Vector<IconButton> toolButtons;
 	protected Vector<IconButton> placementButtons;
@@ -55,17 +54,19 @@ public class BlockZapperScreen extends ZapperScreen {
 	protected boolean currentAcrossMaterials;
 	protected TerrainTools currentTool;
 	protected PlacementOptions currentPlacement;
+	protected final BlockZapperItem zapperItem;
 
 	public BlockZapperScreen(ItemStack zapper, InteractionHand hand) {
 		super(AllGuiTextures.TERRAINZAPPER, zapper, hand);
 		this.background = BZGuiTexture.BLOCK_ZAPPER;
+		this.zapperItem = ((BlockZapperItem)this.zapper.getItem());
 		fontColor = 0x767676;
 		title = zapper.getHoverName();
 
 		CompoundTag nbt = zapper.getOrCreateTag();
 		currentBrush = NBTHelper.readEnum(nbt, "Brush", TerrainBrushes.class);
 		if (nbt.contains("BrushParams", Tag.TAG_COMPOUND)) {
-			BlockPos paramsData = ((BlockZapperItem)this.zapper.getItem()).fixSize(NbtUtils.readBlockPos(nbt.getCompound("BrushParams")), currentBrush.get(), this.zapper);
+			BlockPos paramsData = NbtUtils.readBlockPos(nbt.getCompound("BrushParams"));
 			currentBrushParams[0] = paramsData.getX();
 			currentBrushParams[1] = paramsData.getY();
 			currentBrushParams[2] = paramsData.getZ();
@@ -158,7 +159,6 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	protected void initBrushParams(int x, int y) {
 		Brush currentBrush = this.currentBrush.get();
-		BlockZapperItem zapperItem = ((BlockZapperItem)zapper.getItem());
 
 		// Brush Params
 
@@ -312,7 +312,6 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	@Override
 	protected ConfigureZapperPacket getConfigurationPacket() {
-		currentBrushParams = ((BlockZapperItem)zapper.getItem()).fixSize(currentBrushParams, currentBrush.get(), zapper);
 		int brushParamX = currentBrushParams[0];
 		int brushParamY = followDiagonalsIndicator != null ? followDiagonalsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[1];
 		int brushParamZ = acrossMaterialsIndicator != null ? acrossMaterialsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[2];
@@ -325,4 +324,5 @@ public class BlockZapperScreen extends ZapperScreen {
 		packet.configureZapper(zapper);
 		BZPackets.getChannel().sendToServer(packet);
 	}
+
 }

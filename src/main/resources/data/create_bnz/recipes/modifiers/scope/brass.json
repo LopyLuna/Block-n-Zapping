@@ -7,10 +7,10 @@
       "item": "create_bnz:handheld_block_zapper"
     },
     "A": {
-      "tag": "forge:glass"
+      "tag": "c:glass_blocks"
     },
     "C": {
-      "tag": "forge:ingots/brass"
+      "tag": "c:brass_ingots"
     }
   },
   "pattern": [

@@ -36,6 +36,9 @@ public class BlockZapperItemRenderer extends ZapperItemRenderer {
 	protected static final PartialModel CORE_GLOW_BULK = new PartialModel(CreateBZ.asResource("item/handheld_block_zapper/augments/glow/core_glow_bulk"));
 	public static List<ZapperModel> MODELS = new ArrayList<>();
 
+	public BlockZapperItemRenderer() {
+		renderModels();
+	}
 
 	@Override
 	protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType,

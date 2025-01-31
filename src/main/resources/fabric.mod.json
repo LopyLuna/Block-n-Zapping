@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "create_bnz",
+  "version": "${version}",
+  "name": "Create: Block n' Zapping",
+  "description": "An addon that Adds back Block Zapper from Old Create Versions & Reimagines it!",
+  "authors": [
+    "LopyLuna"
+  ],
+  "contact": {
+    "sources": "https://github.com/LopyLuna/Block-n-Zapping"
+  },
+  "license": "MIT-CODE, ARR-ART",
+  "icon": "pack.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "uwu.lopyluna.create_bnz.CreateBZ"
+    ],
+    "client": [
+      "uwu.lopyluna.create_bnz.CreateBZClient"
+    ],
+    "jei_mod_plugin": [
+      "uwu.lopyluna.create_bnz.compat.jei.CreateBZJEI"
+    ]
+  },
+  "mixins": [
+    "create_bnz.mixin.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": ">=${fabric_api_version}",
+    "create": "${create_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}

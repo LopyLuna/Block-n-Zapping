@@ -20,7 +20,6 @@ import static com.simibubi.create.content.equipment.zapper.ZapperInteractionHand
 
 @Mixin(value = ZapperInteractionHandler.class, remap = false)
 public class ZapperInteractionHandlerSelectMixin {
-
     @Inject(method = "trySelect", at = @At("HEAD"), cancellable = true)
     private static void trySelect(ItemStack stack, Player player, CallbackInfoReturnable<Boolean> cir) {
         if (stack.getItem() instanceof BlockZapperItem item)
@@ -29,7 +28,6 @@ public class ZapperInteractionHandlerSelectMixin {
                 cir.cancel();
             }
     }
-
     @Unique
     private static boolean bnz$trySelect(ItemStack stack, Player player, BlockZapperItem item) {
         Vec3 start = player.position().add(0, player.getEyeHeight(), 0);

@@ -1,9 +1,11 @@
 package uwu.lopyluna.create_bnz.registry;
 
+import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.resources.ResourceLocation;
 import uwu.lopyluna.create_bnz.CreateBZ;
 import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem;
+import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItemRenderer;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
 
@@ -13,6 +15,7 @@ public class BZItems {
 
     public static final ItemEntry<BlockZapperItem> BLOCK_ZAPPER = REGISTRATE.item("handheld_block_zapper", BlockZapperItem::new)
             .lang("Handheld Block Zapper")
+			.transform(CreateRegistrate.customRenderedItem(() -> BlockZapperItemRenderer::new))
             .model((c, p) -> {
                 String path = "item/handheld_block_zapper/augments/";
                 for (Modifiers modifier : Modifiers.values()) for (ModifierTier tier : ModifierTier.values()) {

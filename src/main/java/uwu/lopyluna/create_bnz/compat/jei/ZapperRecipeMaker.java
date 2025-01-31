@@ -40,10 +40,9 @@ public final class ZapperRecipeMaker {
                 }
             }
             ItemStack handgun = new ItemStack(BZItems.BLOCK_ZAPPER.get());
-            assert handgun.getTag() != null;
-            handgun.getTag().putBoolean("jeiView", true);
+            handgun.getOrCreateTag().putBoolean("jeiView", true);
             BlockZapperItem zapperItem = ((BlockZapperItem) handgun.getItem());
-            capturedRecipes.add(new ShapedRecipe(zapperRecipe.getId(), zapperRecipe.getGroup(), CraftingBookCategory.MISC, zapperRecipe.getRecipeWidth(), zapperRecipe.getRecipeHeight(),
+            capturedRecipes.add(new ShapedRecipe(zapperRecipe.getId(), zapperRecipe.getGroup(), CraftingBookCategory.MISC, zapperRecipe.getWidth(), zapperRecipe.getHeight(),
                     ingredients, zapperItem.setModifierToTier(modifier, tier, handgun)));
         }
         return capturedRecipes;

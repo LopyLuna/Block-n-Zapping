@@ -10,7 +10,7 @@
       "item": "minecraft:hopper"
     },
     "C": {
-      "tag": "forge:ingots/brass"
+      "tag": "c:brass_ingots"
     }
   },
   "pattern": [

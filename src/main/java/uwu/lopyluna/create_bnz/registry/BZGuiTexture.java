@@ -1,10 +1,11 @@
 package uwu.lopyluna.create_bnz.registry;
 
 import com.simibubi.create.foundation.gui.element.ScreenElement;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static uwu.lopyluna.create_bnz.CreateBZ.MOD_ID;
 
@@ -32,7 +33,7 @@ public enum BZGuiTexture implements ScreenElement {
         this.startY = startY;
     }
 
-    @OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
     public void render(GuiGraphics graphics, int x, int y) {
         graphics.blit(location, x, y, startX, startY, width, height);
     }

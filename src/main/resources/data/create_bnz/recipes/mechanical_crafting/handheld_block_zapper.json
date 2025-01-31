@@ -3,22 +3,22 @@
   "acceptMirrored": true,
   "key": {
     "Z": {
-      "tag": "forge:ingots/zinc"
+      "tag": "c:zinc_ingots"
     },
     "N": {
-      "tag": "forge:ingots/netherite"
+      "tag": "c:netherite_ingots"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:iron_ingots"
     },
     "P": {
-      "tag": "forge:gems/prismarine"
+      "item": "minecraft:prismarine_crystals"
     },
     "O": {
-      "tag": "forge:dusts/obsidian"
+      "tag": "c:dusts/obsidian"
     },
     "S": {
-      "tag": "forge:nether_stars"
+      "tag": "c:nether_stars"
     },
     "M": {
       "item": "create:precision_mechanism"
