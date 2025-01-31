@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -71,7 +72,7 @@ public class BlockZapperItem extends ZapperItem implements DamageableItem, Vanis
 	static final String PLACEMENT = "Placement"; //ENUM
 
 	public BlockZapperItem(Properties properties) {
-		super(properties.defaultDurability(1536));
+		super(properties);
 	}
 
 	@Override
@@ -438,6 +439,17 @@ public class BlockZapperItem extends ZapperItem implements DamageableItem, Vanis
 
 	public int getMaxModifierSlots(CompoundTag nbt) {
 		return nbt.getInt(APPLICATOR.baseName) > 0 ? 5 : 3;
+	}
+
+	@Override
+	public int getBarWidth(ItemStack stack) {
+		return Math.round(13.0F - (float)stack.getDamageValue() * 13.0F / (float)getMaxDamage(stack));
+	}
+
+	@Override
+	public int getBarColor(ItemStack stack) {
+		float f = Math.max(0.0F, ((float)getMaxDamage(stack) - (float)stack.getDamageValue()) / (float)getMaxDamage(stack));
+		return Mth.hsvToRgb(f / 3.0F, 1.0F, 1.0F);
 	}
 
 	@Override
