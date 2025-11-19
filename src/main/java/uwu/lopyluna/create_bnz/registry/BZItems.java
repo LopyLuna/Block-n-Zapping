@@ -7,11 +7,11 @@ import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
 
-import static uwu.lopyluna.create_bnz.CreateBZ.REGISTRATE;
+import static uwu.lopyluna.create_bnz.CreateBZ.REG;
 
 public class BZItems {
 
-    public static final ItemEntry<BlockZapperItem> BLOCK_ZAPPER = REGISTRATE.item("handheld_block_zapper", BlockZapperItem::new)
+    public static final ItemEntry<BlockZapperItem> BLOCK_ZAPPER = REG.item("handheld_block_zapper", BlockZapperItem::new)
             .lang("Handheld Block Zapper")
             .model((c, p) -> {
                 String path = "item/handheld_block_zapper/augments/";
@@ -20,7 +20,7 @@ public class BZItems {
                     if (!((modifier.isUpgrade && tier == ModifierTier.SPECIAL) || (!modifier.isUpgrade && tier != ModifierTier.SPECIAL))) continue;
 
                     String augPath = path + tier.id + "/" + modifier.id;
-                    ResourceLocation parentPath = CreateBZ.asResource(path + modifier.id);
+                    ResourceLocation parentPath = CreateBZ.loc(path + modifier.id);
 
                     p.withExistingParent(augPath, parentPath)
                             .texture("0", "create_bnz:item/block_zapper_mesh_" + tier.id)

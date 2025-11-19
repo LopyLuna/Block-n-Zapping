@@ -37,7 +37,8 @@ public class ZapperInteractionHandlerSelectMixin {
         BlockHitResult raytrace = player.level().clip(new ClipContext(start, start.add(range), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
         BlockPos pos = raytrace.getBlockPos();
         BlockState newState = player.level().getBlockState(pos);
-        if (newState.getBlock().defaultDestroyTime() > item.getHardnessSupport(stack)) {
+        float hardness = newState.getBlock().defaultDestroyTime();
+        if (hardness < 0 || hardness > item.getHardnessSupport(stack)) {
             AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition());
             return true;
         }

@@ -1,6 +1,6 @@
 package uwu.lopyluna.create_bnz.registry;
 
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -118,7 +118,7 @@ public class BZTags {
 		}
 
 		AllBlockTags(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? Lang.asId(name()) : path);
+			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? CreateLang.asId(name()) : path);
 			if (optional) {
 				tag = optionalTag(ForgeRegistries.BLOCKS, id);
 			} else {
@@ -169,7 +169,7 @@ public class BZTags {
 		}
 
 		AllItemTags(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? Lang.asId(name()) : path);
+			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? CreateLang.asId(name()) : path);
 			if (optional) {
 				tag = optionalTag(ForgeRegistries.ITEMS, id);
 			} else {
@@ -216,7 +216,7 @@ public class BZTags {
 		}
 
 		AllFluidTags(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? Lang.asId(name()) : path);
+			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? CreateLang.asId(name()) : path);
 			if (optional) {
 				tag = optionalTag(ForgeRegistries.FLUIDS, id);
 			} else {
@@ -262,7 +262,7 @@ public class BZTags {
 		}
 
 		BZEntityTags(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? Lang.asId(name()) : path);
+			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? CreateLang.asId(name()) : path);
 			if (optional) {
 				tag = optionalTag(ForgeRegistries.ENTITY_TYPES, id);
 			} else {
@@ -307,7 +307,7 @@ public class BZTags {
 		}
 
 		BZRecipeSerializerTags(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? Lang.asId(name()) : path);
+			ResourceLocation id = new ResourceLocation(namespace.id, path == null ? CreateLang.asId(name()) : path);
 			if (optional) {
 				tag = optionalTag(ForgeRegistries.RECIPE_SERIALIZERS, id);
 			} else {

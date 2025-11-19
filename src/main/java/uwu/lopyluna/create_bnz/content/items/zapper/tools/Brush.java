@@ -1,6 +1,6 @@
 package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -52,8 +52,7 @@ public abstract class Brush {
 	}
 
 	public Component getParamLabel(int paramIndex) {
-		return Lang
-			.translateDirect(paramIndex == 0 ? "generic.width" : paramIndex == 1 ? "generic.height" : "generic.length");
+		return CreateLang.translateDirect(paramIndex == 0 ? "generic.width" : paramIndex == 1 ? "generic.height" : "generic.length");
 	}
 
 	public int get(int paramIndex) {

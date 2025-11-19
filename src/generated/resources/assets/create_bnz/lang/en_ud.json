@@ -26,6 +26,9 @@
   "create_bnz.modifier.create_bnz.stasis": "sısɐʇS",
   "create_bnz.modifier.create_bnz.stasis.desc": "sǝʇɐpd∩ ʞɔoןᗺ ʍoןןɐsıᗡ",
   "create_bnz.tooltip.holdForModifiers": " pןoH",
+  "generic.offset_x": "X ʇǝsɟɟO",
+  "generic.offset_y": "ʎ ʇǝsɟɟO",
+  "generic.offset_z": "Z ʇǝsɟɟO",
   "item.create_bnz.handheld_block_zapper": "ɹǝddɐZ ʞɔoןᗺ pןǝɥpuɐH",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour1": "˙ɹǝdɐɥs ǝɥʇ ʎq pǝɔɐןd ‾ןɐıɹǝʇɐɯ‾ ǝɥʇ ǝɯoɔǝq ןןıʍ ‾ʞɔoןq pǝʇǝbɹɐ⟘‾",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour2": "˙uoıʇɐɔoן pǝʇǝbɹɐʇ ǝɥʇ ʇɐ ‾ןoo⟘‾ puɐ ‾ɥsnɹᗺ‾ pǝʇɔǝןǝs ʎןʇuǝɹɹnɔ sǝıןddⱯ",
@@ -34,5 +37,7 @@
   "item.create_bnz.handheld_block_zapper.tooltip.condition2": "ʞɔoןᗺ ʇɐ ʞɔıןƆ-ᴚ",
   "item.create_bnz.handheld_block_zapper.tooltip.condition3": "buıʞɐǝuS ǝןıɥʍ ʞɔıןƆ-ᴚ",
   "item.create_bnz.handheld_block_zapper.tooltip.summary": "˙ǝɔuɐʇsıp ʇuǝɔǝp ɐ ɯoɹɟ ‾buıdɐɔspuɐן‾ ǝןɐɔs-ɯnıpǝɯ ɹoɟ ןooʇ ‾ǝpoɯ ןɐʌıʌɹnS",
-  "itemGroup.create_bnz.base": "buıddɐZ ,u ʞɔoןᗺ :ǝʇɐǝɹƆ"
+  "itemGroup.create_bnz.base": "buıddɐZ ,u ʞɔoןᗺ :ǝʇɐǝɹƆ",
+  "key.categories.create_bnz": "buıddɐZ ,u ʞɔoןᗺ :ǝʇɐǝɹƆ",
+  "key.create_bnz.open_block_zapper_gui": "I∩⅁ ɹǝddɐZ ʞɔoןᗺ uǝdO"
 }

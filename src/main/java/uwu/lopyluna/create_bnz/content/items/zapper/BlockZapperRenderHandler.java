@@ -1,13 +1,14 @@
 package uwu.lopyluna.create_bnz.content.items.zapper;
 
 import com.simibubi.create.AllSpecialTextures;
-import com.simibubi.create.CreateClient;
-import com.simibubi.create.foundation.utility.NBTHelper;
+import net.createmod.catnip.nbt.NBTHelper;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
@@ -31,10 +32,9 @@ public class BlockZapperRenderHandler {
 
 	public static void tick() {
 		gatherSelectedBlocks();
-		if (renderedPositions == null)
-			return;
+		if (renderedPositions == null) return;
 
-		CreateClient.OUTLINER.showCluster("terrainZapper", renderedPositions.get())
+		Outliner.getInstance().showCluster("terrainZapper", renderedPositions.get())
 				.colored(0xbfbfbf)
 				.disableLineNormals()
 				.lineWidth(1 / 32f)
@@ -90,7 +90,15 @@ public class BlockZapperRenderHandler {
 		}
 
 		BlockPos pos = raytrace.getBlockPos().offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), placement));
-		renderedPositions = () -> brush.addToGlobalPositions(level, pos, raytrace.getDirection(), new ArrayList<>(), tool);
+
+		// Apply manual offset
+		if (tag.contains("BrushOffset", Tag.TAG_COMPOUND)) {
+			BlockPos offset = NbtUtils.readBlockPos(tag.getCompound("BrushOffset"));
+			pos = pos.offset(offset);
+		}
+
+		final BlockPos finalPos = pos;
+		renderedPositions = () -> brush.addToGlobalPositions(level, finalPos, raytrace.getDirection(), new ArrayList<>(), tool);
 	}
 
 }

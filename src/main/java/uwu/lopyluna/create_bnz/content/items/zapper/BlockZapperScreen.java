@@ -5,17 +5,17 @@ import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ZapperScreen;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.gui.element.GuiGameElement;
 import com.simibubi.create.foundation.gui.widget.*;
 import com.simibubi.create.foundation.gui.widget.Indicator.State;
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.gui.element.GuiGameElement;
+import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -32,10 +32,10 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	protected BZGuiTexture background;
 
-    protected final Component placementSection = Lang.translateDirect("gui.terrainzapper.placement");
-	protected final Component toolSection = Lang.translateDirect("gui.terrainzapper.tool");
+    protected final Component placementSection = CreateLang.translateDirect("gui.terrainzapper.placement");
+	protected final Component toolSection = CreateLang.translateDirect("gui.terrainzapper.tool");
 	protected final List<Component> brushOptions =
-		Lang.translatedOptions("gui.terrainzapper.brush", "cuboid", "sphere", "cylinder", "surface", "cluster");
+		CreateLang.translatedOptions("gui.terrainzapper.brush", "cuboid", "sphere", "cylinder", "surface", "cluster");
 
 	protected Vector<IconButton> toolButtons;
 	protected Vector<IconButton> placementButtons;
@@ -44,6 +44,8 @@ public class BlockZapperScreen extends ZapperScreen {
 	protected Label brushLabel;
 	protected Vector<ScrollInput> brushParams = new Vector<>(3);
 	protected Vector<Label> brushParamLabels = new Vector<>(3);
+	protected Vector<ScrollInput> offsetParams = new Vector<>(3);
+	protected Vector<Label> offsetParamLabels = new Vector<>(3);
 	protected IconButton followDiagonals;
 	protected IconButton acrossMaterials;
 	protected Indicator followDiagonalsIndicator;
@@ -51,6 +53,7 @@ public class BlockZapperScreen extends ZapperScreen {
 
 	protected TerrainBrushes currentBrush;
 	protected int[] currentBrushParams = new int[] { 1, 1, 1 };
+	protected int[] currentOffsetParams = new int[] { 0, 0, 0 };
 	protected boolean currentFollowDiagonals;
 	protected boolean currentAcrossMaterials;
 	protected TerrainTools currentTool;
@@ -69,12 +72,14 @@ public class BlockZapperScreen extends ZapperScreen {
 			currentBrushParams[0] = paramsData.getX();
 			currentBrushParams[1] = paramsData.getY();
 			currentBrushParams[2] = paramsData.getZ();
-			if (currentBrushParams[1] == 0) {
-				currentFollowDiagonals = true;
-			}
-			if (currentBrushParams[2] == 0) {
-				currentAcrossMaterials = true;
-			}
+			if (currentBrushParams[1] == 0) currentFollowDiagonals = true;
+			if (currentBrushParams[2] == 0) currentAcrossMaterials = true;
+		}
+		if (nbt.contains("BrushOffset", Tag.TAG_COMPOUND)) {
+			BlockPos offsetData = NbtUtils.readBlockPos(nbt.getCompound("BrushOffset"));
+			currentOffsetParams[0] = offsetData.getX();
+			currentOffsetParams[1] = offsetData.getY();
+			currentOffsetParams[2] = offsetData.getZ();
 		}
 		currentTool = NBTHelper.readEnum(nbt, "Tool", TerrainTools.class);
 		currentPlacement = NBTHelper.readEnum(nbt, "Placement", PlacementOptions.class);
@@ -126,22 +131,22 @@ public class BlockZapperScreen extends ZapperScreen {
 				PlacementPatterns pattern = PlacementPatterns.values()[id];
 				IconButton patternButton = new IconButton(x + background.width - 76 + col * 18, y + 21 + row * 18, pattern.icon);
 				patternButton.withCallback(() -> {
-					patternButtons.forEach(b -> b.active = true);
-					patternButton.active = false;
+					patternButtons.forEach(b -> b.green = false);
+					patternButton.green = true;
 					currentPattern = pattern;
 				});
-				patternButton.setToolTip(Lang.translateDirect("gui.terrainzapper.pattern." + pattern.translationKey));
+				patternButton.setToolTip(CreateLang.translateDirect("gui.terrainzapper.pattern." + pattern.translationKey));
 				patternButtons.add(patternButton);
 			}
 		}
 
-		patternButtons.get(currentPattern.ordinal()).active = false;
+		patternButtons.get(currentPattern.ordinal()).green = true;
 
 		addRenderableWidgets(patternButtons);
 
-		brushLabel = new Label(x + 61, y + 25, Components.immutableEmpty()).withShadow();
+		brushLabel = new Label(x + 61, y + 25, CommonComponents.EMPTY).withShadow();
 		brushInput = new SelectionScrollInput(x + 56, y + 20, 77, 18).forOptions(brushOptions)
-			.titled(Lang.translateDirect("gui.terrainzapper.brush"))
+			.titled(CreateLang.translateDirect("gui.terrainzapper.brush"))
 			.writingTo(brushLabel)
 			.calling(brushIndex -> {
 				currentBrush = TerrainBrushes.values()[brushIndex];
@@ -154,6 +159,7 @@ public class BlockZapperScreen extends ZapperScreen {
 		addRenderableWidget(brushInput);
 
 		initBrushParams(x, y);
+		initOffsetParams(x, y);
 	}
 
 	protected void initBrushParams(int x, int y) {
@@ -169,7 +175,7 @@ public class BlockZapperScreen extends ZapperScreen {
 		brushParams.clear();
 
 		for (int index = 0; index < 3; index++) {
-			Label label = new Label(x + 65 + 20 * index, y + 45, Components.immutableEmpty()).withShadow();
+			Label label = new Label(x + 65 + 20 * index, y + 45, CommonComponents.EMPTY).withShadow();
 
 			final int finalIndex = index;
 			ScrollInput input = new ScrollInput(x + 56 + 20 * index, y + 40, 18, 18)
@@ -214,22 +220,22 @@ public class BlockZapperScreen extends ZapperScreen {
 		if (currentBrush.hasConnectivityOptions()) {
 			int x1 = x + 7 + 4 * 18;
 			int y1 = y + 79;
-			followDiagonalsIndicator = new Indicator(x1, y1 - 6, Components.immutableEmpty());
+			followDiagonalsIndicator = new Indicator(x1, y1 - 6, CommonComponents.EMPTY);
 			followDiagonals = new IconButton(x1, y1, AllIcons.I_FOLLOW_DIAGONAL);
 			x1 += 18;
-			acrossMaterialsIndicator = new Indicator(x1, y1 - 6, Components.immutableEmpty());
+			acrossMaterialsIndicator = new Indicator(x1, y1 - 6, CommonComponents.EMPTY);
 			acrossMaterials = new IconButton(x1, y1, AllIcons.I_FOLLOW_MATERIAL);
 
 			followDiagonals.withCallback(() -> {
 				followDiagonalsIndicator.state = followDiagonalsIndicator.state == State.OFF ? State.ON : State.OFF;
 				currentFollowDiagonals = !currentFollowDiagonals;
 			});
-			followDiagonals.setToolTip(Lang.translateDirect("gui.terrainzapper.searchDiagonal"));
+			followDiagonals.setToolTip(CreateLang.translateDirect("gui.terrainzapper.searchDiagonal"));
 			acrossMaterials.withCallback(() -> {
 				acrossMaterialsIndicator.state = acrossMaterialsIndicator.state == State.OFF ? State.ON : State.OFF;
 				currentAcrossMaterials = !currentAcrossMaterials;
 			});
-			acrossMaterials.setToolTip(Lang.translateDirect("gui.terrainzapper.searchFuzzy"));
+			acrossMaterials.setToolTip(CreateLang.translateDirect("gui.terrainzapper.searchFuzzy"));
 			addRenderableWidget(followDiagonals);
 			addRenderableWidget(followDiagonalsIndicator);
 			addRenderableWidget(acrossMaterials);
@@ -249,13 +255,13 @@ public class BlockZapperScreen extends ZapperScreen {
 		toolButtons = new Vector<>(toolValues.length);
 		for (int id = 0; id < toolValues.length; id++) {
 			TerrainTools tool = toolValues[id];
-			IconButton toolButton = new IconButton(x + 7 + id * 18, y + 79, tool.icon);
+			IconButton toolButton = new IconButton(x + 7 + id * 18, y + 99, tool.icon);
 			toolButton.withCallback(() -> {
-				toolButtons.forEach(b -> b.active = true);
-				toolButton.active = false;
+				toolButtons.forEach(b -> b.green = false);
+				toolButton.green = true;
 				currentTool = tool;
 			});
-			toolButton.setToolTip(Lang.translateDirect("gui.terrainzapper.tool." + tool.translationKey));
+			toolButton.setToolTip(CreateLang.translateDirect("gui.terrainzapper.tool." + tool.translationKey));
 			toolButtons.add(toolButton);
 		}
 
@@ -267,47 +273,86 @@ public class BlockZapperScreen extends ZapperScreen {
 			currentTool = toolValues[0];
 			toolIndex = 0;
 		}
-		toolButtons.get(toolIndex).active = false;
+		toolButtons.get(toolIndex).green = true;
 
 		addRenderableWidgets(toolButtons);
 
 		// Placement Options
 
-		if (placementButtons != null)
-			removeWidgets(placementButtons);
+		if (placementButtons != null) removeWidgets(placementButtons);
 
 		if (currentBrush.hasPlacementOptions()) {
 			PlacementOptions[] placementValues = PlacementOptions.values();
 			placementButtons = new Vector<>(placementValues.length);
 			for (int id = 0; id < placementValues.length; id++) {
 				PlacementOptions option = placementValues[id];
-				IconButton placementButton = new IconButton(x + 136 + id * 18, y + 79, option.icon);
+				IconButton placementButton = new IconButton(x + 136 + id * 18, y + 99, option.icon);
 				placementButton.withCallback(() -> {
-					placementButtons.forEach(b -> b.active = true);
-					placementButton.active = false;
+					placementButtons.forEach(b -> b.green = false);
+					placementButton.green = true;
 					currentPlacement = option;
 				});
-				placementButton.setToolTip(Lang.translateDirect("gui.terrainzapper.placement." + option.translationKey));
+				placementButton.setToolTip(CreateLang.translateDirect("gui.terrainzapper.placement." + option.translationKey));
 				placementButtons.add(placementButton);
 			}
 
-			placementButtons.get(currentPlacement.ordinal()).active = false;
+			placementButtons.get(currentPlacement.ordinal()).green = true;
 
 			addRenderableWidgets(placementButtons);
 		}
 	}
 
+	protected void initOffsetParams(int x, int y) {
+		Brush currentBrush = this.currentBrush.get();
+		BlockZapperItem zapperItem = ((BlockZapperItem)zapper.getItem());
+
+		// Offset Params
+		removeWidgets(offsetParamLabels);
+		removeWidgets(offsetParams);
+
+		offsetParamLabels.clear();
+		offsetParams.clear();
+
+		Component[] offsetLabels = new Component[] {
+				Component.translatable("generic.offset_x"),
+				Component.translatable("generic.offset_y"),
+				Component.translatable("generic.offset_z")
+		};
+
+
+		for (int index = 0; index < 3; index++) {
+			var max = zapperItem.indexMax(currentBrush.getMax(index), currentBrush, zapper);
+			Label label = new Label(x + 65 + 20 * index, y + 65, CommonComponents.EMPTY).withShadow();
+
+			final int finalIndex = index;
+			ScrollInput input = new ScrollInput(x + 56 + 20 * index, y + 60, 18, 18)
+					.withRange(max * -1, max + 1)
+					.writingTo(label)
+					.titled(offsetLabels[index].plainCopy())
+					.calling(state -> {
+						currentOffsetParams[finalIndex] = state;
+						label.setX(x + 65 + 20 * finalIndex - font.width(label.text) / 2);
+					});
+			input.setState(currentOffsetParams[index]);
+			input.onChanged();
+
+			offsetParamLabels.add(label);
+			offsetParams.add(input);
+		}
+
+		addRenderableWidgets(offsetParamLabels);
+		addRenderableWidgets(offsetParams);
+	}
+
 	@Override
 	protected void drawOnBackground(GuiGraphics graphics, int x, int y) {
-		graphics.drawString(font, title, x + 11, y + 4, 0x592424, false);
+		graphics.drawString(font, title, x + (background.width - font.width(title)) / 2, y + 4, 0x592424, false);
 
 		Brush currentBrush = this.currentBrush.get();
-		for (int index = 2; index >= currentBrush.amtParams; index--)
-			BZGuiTexture.BLOCK_ZAPPER_INACTIVE_PARAM.render(graphics, x + 56 + 20 * index, y + 40);
+		for (int index = 2; index >= currentBrush.amtParams; index--) BZGuiTexture.BLOCK_ZAPPER_INACTIVE_PARAM.render(graphics, x + 56 + 20 * index, y + 40);
 
-		graphics.drawString(font, toolSection, x + 7, y + 69, fontColor, false);
-		if (currentBrush.hasPlacementOptions())
-			graphics.drawString(font, placementSection, x + 136, y + 69, fontColor, false);
+		graphics.drawString(font, toolSection, x + 7, y + 89, fontColor, false);
+		if (currentBrush.hasPlacementOptions()) graphics.drawString(font, placementSection, x + 136, y + 89, fontColor, false);
 	}
 
 	@Override
@@ -316,7 +361,10 @@ public class BlockZapperScreen extends ZapperScreen {
 		int brushParamX = currentBrushParams[0];
 		int brushParamY = followDiagonalsIndicator != null ? followDiagonalsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[1];
 		int brushParamZ = acrossMaterialsIndicator != null ? acrossMaterialsIndicator.state == State.ON ? 0 : 1 : currentBrushParams[2];
-		return new ConfigureBlockZapperPacket(hand, currentPattern, currentBrush, brushParamX, brushParamY, brushParamZ, currentTool, currentPlacement);
+		int offsetX = currentOffsetParams[0];
+		int offsetY = currentOffsetParams[1];
+		int offsetZ = currentOffsetParams[2];
+		return new ConfigureBlockZapperPacket(hand, currentPattern, currentBrush, brushParamX, brushParamY, brushParamZ, offsetX, offsetY, offsetZ, currentTool, currentPlacement);
 	}
 
 	@Override

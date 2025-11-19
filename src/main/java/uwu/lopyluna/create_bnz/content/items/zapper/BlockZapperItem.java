@@ -7,11 +7,11 @@ import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ShootableGadgetItemMethods;
 import com.simibubi.create.content.equipment.zapper.ZapperBeamPacket;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
-import com.simibubi.create.foundation.gui.ScreenOpener;
 import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 import com.simibubi.create.foundation.utility.BlockHelper;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.NBTHelper;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.gui.ScreenOpener;
+import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -28,6 +28,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -38,7 +40,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import uwu.lopyluna.create_bnz.config.BZConfig;
 import uwu.lopyluna.create_bnz.content.items.zapper.tools.*;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
@@ -76,8 +79,7 @@ public class BlockZapperItem extends ZapperItem {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flagIn) {
-		var nbt = stack.getTag();
-		assert nbt != null;
+		var nbt = stack.getOrCreateTag();
 		boolean jeiDisplay = nbt.contains("jeiView");
 		if (!jeiDisplay) tooltip.add(holdCtrl());
 		if (!hasShiftDown() || jeiDisplay) {
@@ -96,7 +98,7 @@ public class BlockZapperItem extends ZapperItem {
 				if (!jeiDisplay) {
 					for (int j = 0; j < 3; j++) {
 						Modifiers modifiers = NBTHelper.readEnum(nbt, APPLIED_UPGRADES + j, Modifiers.class);
-						if (modifiers != null && modifiers != EMPTY) {
+						if (modifiers != EMPTY) {
                             tooltip.add(modifiers.getName().withStyle(styleFromColor(modifiers.getTierFromModifier(nbt).color.getRGB())));
 							tooltip.add(modifiers.getDescription().withStyle(ChatFormatting.DARK_GRAY));
 						}
@@ -117,11 +119,11 @@ public class BlockZapperItem extends ZapperItem {
 			int size = nbt.getInt("Size");
 			size = size==999999 ? 0 : size;
 
-			if (stack.hasTag() && stack.getTag().contains("BlockUsed")) {
-				MutableComponent usedBlock = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), stack.getTag().getCompound("BlockUsed")).getBlock().getName();
+			if (stack.hasTag() && stack.getOrCreateTag().contains("BlockUsed")) {
+				MutableComponent usedBlock = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), stack.getOrCreateTag().getCompound("BlockUsed")).getBlock().getName();
 				var color = amount >= size ? ChatFormatting.GOLD : ChatFormatting.RED;
 				tooltip.add(Component.empty()
-						.append(Lang.translateDirect("terrainzapper.usingBlock", usedBlock.withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY))
+						.append(CreateLang.translateDirect("terrainzapper.usingBlock", usedBlock.withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY))
 						.append(Component.empty().append(" : ").withStyle(ChatFormatting.DARK_GRAY))
 						.append(Component.literal(amount + "").withStyle(color))
 						.append(Component.literal("/").withStyle(ChatFormatting.GRAY))
@@ -141,8 +143,7 @@ public class BlockZapperItem extends ZapperItem {
 
 	@Override
 	public Component validateUsage(ItemStack item) {
-		if (!item.getOrCreateTag().contains(BRUSH_PARAMS))
-			return Lang.translateDirect("terrainzapper.shiftRightClickToSet");
+		if (!item.getOrCreateTag().contains(BRUSH_PARAMS)) return CreateLang.translateDirect("terrainzapper.shiftRightClickToSet");
 		return super.validateUsage(item);
 	}
 
@@ -158,19 +159,21 @@ public class BlockZapperItem extends ZapperItem {
 		return false;
 	}
 
-	public float activate(Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
-		BlockPos targetPos = raytrace.getBlockPos();
+	public float activate(BlockPos targetPos, Brush brush, PlacementOptions option, CompoundTag tag, Level world, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data, BlockZapperItem zapperItem, InteractionHand hand) {
 		List<BlockPos> affectedPositions = new ArrayList<>();
 
-		CompoundTag tag = stack.getOrCreateTag();
-		Brush brush = NBTHelper.readEnum(tag, BRUSH, TerrainBrushes.class).get();
 		BlockPos params = fixSize(NbtUtils.readBlockPos(tag.getCompound(BRUSH_PARAMS)), brush, stack);
 		float multiplier = sizeMultiplier(params, brush, stack);
 
-		PlacementOptions option = NBTHelper.readEnum(tag, PLACEMENT, PlacementOptions.class);
 		TerrainTools tool = NBTHelper.readEnum(tag, TOOL, TerrainTools.class);
 		brush.set(params.getX(), params.getY(), params.getZ());
 		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
+
+		if (tag.contains("BrushOffset", Tag.TAG_COMPOUND)) {
+			BlockPos offset = NbtUtils.readBlockPos(tag.getCompound("BrushOffset"));
+			targetPos = targetPos.offset(offset);
+		}
+
 		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
 		brush.redirectTool(tool).run(world, affectedPositions, stateToUse, data, player, stack, zapperItem, hand, applyPattern(affectedPositions, stack));
 		return multiplier;
@@ -187,13 +190,19 @@ public class BlockZapperItem extends ZapperItem {
 
 		brush.set(params.getX(), params.getY(), params.getZ());
 		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
+
+		if (tag.contains("BrushOffset", Tag.TAG_COMPOUND)) {
+			BlockPos offset = NbtUtils.readBlockPos(tag.getCompound("BrushOffset"));
+			targetPos = targetPos.offset(offset);
+		}
+
 		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
 		return brush.redirectTool(tool).runCalculate(world, affectedPositions, stateToUse, stack, zapperItem);
 	}
 
 	@SuppressWarnings("all")
 	public static PlacementPatterns applyPattern(List<BlockPos> blocksIn, ItemStack stack) {
-		CompoundTag tag = stack.getTag();
+		CompoundTag tag = stack.getOrCreateTag();
 		PlacementPatterns pattern = !tag.contains("Pattern") ? Solid : PlacementPatterns.valueOf(tag.getString("Pattern"));
 		Predicate<BlockPos> filter = Predicates.alwaysFalse();
 
@@ -204,19 +213,19 @@ public class BlockZapperItem extends ZapperItem {
 			case InverseCheckered:
 				filter = pos -> (pos.getX() + pos.getY() + pos.getZ()) % 2 != 0;
 				break;
-			default:
-				break;
+			default: break;
 		}
 
 		blocksIn.removeIf(filter);
 		return pattern;
 	}
 
-	public static void configureSettings(ItemStack stack, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool, PlacementOptions placement) {
+	public static void configureSettings(ItemStack stack, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, int offsetX, int offsetY, int offsetZ, TerrainTools tool, PlacementOptions placement) {
 		ZapperItem.configureSettings(stack, pattern);
 		CompoundTag nbt = stack.getOrCreateTag();
 		NBTHelper.writeEnum(nbt, BRUSH, brush);
 		nbt.put(BRUSH_PARAMS, NbtUtils.writeBlockPos(new BlockPos(brushParamX, brushParamY, brushParamZ)));
+		nbt.put("BrushOffset", NbtUtils.writeBlockPos(new BlockPos(offsetX, offsetY, offsetZ)));
 		NBTHelper.writeEnum(nbt, TOOL, tool);
 		NBTHelper.writeEnum(nbt, PLACEMENT, placement);
 	}
@@ -255,11 +264,10 @@ public class BlockZapperItem extends ZapperItem {
 	}
 
 	@Override
-	public @NotNull Rarity getRarity(ItemStack pStack) {
+	public @NonNull Rarity getRarity(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		int echo_slots = 0;
-		for (int j = 0; j < 5; j++)
-			if (NBTHelper.readEnum(nbt, APPLIED_MODIFIER + j, Modifiers.class).getLevel(nbt) >= ModifierTier.ECHO.level) echo_slots++;
+		for (int j = 0; j < 5; j++) if (NBTHelper.readEnum(nbt, APPLIED_MODIFIER + j, Modifiers.class).getLevel(nbt) >= ModifierTier.ECHO.level) echo_slots++;
 		if (echo_slots == 5) return Rarity.EPIC;
 		if (echo_slots > 0) return Rarity.RARE;
 		return Rarity.UNCOMMON;
@@ -267,7 +275,7 @@ public class BlockZapperItem extends ZapperItem {
 
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public @NonNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack item = player.getItemInHand(hand);
 
 		CompoundTag nbt = item.getOrCreateTag();
@@ -302,10 +310,23 @@ public class BlockZapperItem extends ZapperItem {
 				player.getCooldowns().addCooldown(item.getItem(), 10);
 				return new InteractionResultHolder<>(InteractionResult.FAIL, item);
 			} else if (!player.isShiftKeyDown() && items && lookingAtBlock) {
-				float multiplier = activate(level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
+				Vec3 target = raytrace.getLocation();
+				BlockPos targetPos = raytrace.getBlockPos();
+				CompoundTag tag = item.getOrCreateTag();
+				Brush brush = NBTHelper.readEnum(tag, BRUSH, TerrainBrushes.class).get();
+				PlacementOptions option = NBTHelper.readEnum(tag, PLACEMENT, PlacementOptions.class);
+				float multiplier = activate(targetPos, brush, option, tag, level, player, item, stateToUse, raytrace, data, (BlockZapperItem) item.getItem(), hand);
+
+				targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
+				if (tag.contains("BrushOffset", Tag.TAG_COMPOUND)) {
+					BlockPos offset = NbtUtils.readBlockPos(tag.getCompound("BrushOffset"));
+					target = targetPos.offset(offset).getCenter();
+				}
+
 				int cooldown = (int) (multiplier * getCooldownDelay(item));
 				ShootableGadgetItemMethods.applyCooldown(player, item, hand, this::isZapper, Math.max(cooldown, 5));
-				ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, raytrace.getLocation(), hand, b));
+				Vec3 finalTarget = target;
+				ShootableGadgetItemMethods.sendPackets(player, b -> new ZapperBeamPacket(barrelPos, finalTarget, hand, b));
 				return new InteractionResultHolder<>(InteractionResult.SUCCESS, item);
 			}  else return super.use(level, player, hand);
 		}
@@ -353,7 +374,7 @@ public class BlockZapperItem extends ZapperItem {
 		for (int j = 0; j < 3; j++) {
 			String upgrades = APPLIED_UPGRADES + j;
 			Modifiers modifiers = NBTHelper.readEnum(nbt, upgrades, Modifiers.class);
-			if (modifiers == null || modifiers == EMPTY) {
+			if (modifiers == EMPTY) {
 				NBTHelper.writeEnum(nbt, upgrades, modifier);
 				break;
 			}
@@ -428,71 +449,105 @@ public class BlockZapperItem extends ZapperItem {
 	public int getMaxSize(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		return switch (AMPLIFIER.getLevel(nbt)) {
-			case 1 -> 6;
-			case 2 -> 8;
-			case 3 -> 12;
-			case 4 -> 16;
-			default -> 4;
+			case 1 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_1_MAX_SIZE.get();
+			case 2 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_2_MAX_SIZE.get();
+			case 3 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_3_MAX_SIZE.get();
+			case 4 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_4_MAX_SIZE.get();
+			default -> BZConfig.BZCommonConfig.AMPLIFIER_DEFAULT_MAX_SIZE.get();
 		};
 	}
 	public int getMaxRadius(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		return switch (AMPLIFIER.getLevel(nbt)) {
-			case 1 -> 3;
-			case 2 -> 4;
-			case 3 -> 5;
-			case 4 -> 6;
-			default -> 2;
+			case 1 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_1_MAX_RADIUS.get();
+			case 2 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_2_MAX_RADIUS.get();
+			case 3 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_3_MAX_RADIUS.get();
+			case 4 -> BZConfig.BZCommonConfig.AMPLIFIER_LEVEL_4_MAX_RADIUS.get();
+			default -> BZConfig.BZCommonConfig.AMPLIFIER_DEFAULT_MAX_RADIUS.get();
 		};
 	}
 
 	public int getHardnessSupport(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
 		return switch (BODY.getLevel(nbt)) {
-			case 1 -> 4;
-			case 2 -> 8;
-			case 3 -> 25;
-			case 4 -> 50;
-			default -> 2;
+			case 1 -> BZConfig.BZCommonConfig.BODY_LEVEL_1_HARDNESS.get();
+			case 2 -> BZConfig.BZCommonConfig.BODY_LEVEL_2_HARDNESS.get();
+			case 3 -> BZConfig.BZCommonConfig.BODY_LEVEL_3_HARDNESS.get();
+			case 4 -> BZConfig.BZCommonConfig.BODY_LEVEL_4_HARDNESS.get();
+			default -> BZConfig.BZCommonConfig.BODY_DEFAULT_HARDNESS.get();
 		};
 	}
 
 	public int getMaxModifierSlots(CompoundTag nbt) {
-		return nbt.getInt(APPLICATOR.baseName) > 0 ? 5 : 3;
+		return nbt.getInt(APPLICATOR.baseName) > 0
+			? BZConfig.BZCommonConfig.APPLICATOR_UPGRADED_SLOTS.get()
+			: BZConfig.BZCommonConfig.APPLICATOR_BASE_SLOTS.get();
 	}
 
 	@Override
 	public boolean isDamageable(ItemStack pStack) {
-		return true;
-	}
+		CompoundTag nbt = pStack.getOrCreateTag();
+        return !BZConfig.BZCommonConfig.REINFORCER_LEVEL_4_UNBREAKABLE.get() || REINFORCER.getLevel(nbt) < 4;
+    }
 
 	@Override
 	public int getMaxDamage(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		double level = REINFORCER.getLevel(nbt);
-		double multiplier = level==0 ? 1 : (level * 0.5) + level;
-		return (int)(1536 * multiplier);
+		int level = REINFORCER.getLevel(nbt);
+		int baseDurability = BZConfig.BZCommonConfig.REINFORCER_BASE_DURABILITY.get();
+
+		return switch (level) {
+			case 1 -> (baseDurability * BZConfig.BZCommonConfig.REINFORCER_LEVEL_1_MULTIPLIER.get()) / 100;
+			case 2 -> (baseDurability * BZConfig.BZCommonConfig.REINFORCER_LEVEL_2_MULTIPLIER.get()) / 100;
+			case 3 -> (baseDurability * BZConfig.BZCommonConfig.REINFORCER_LEVEL_3_MULTIPLIER.get()) / 100;
+			case 4 -> (baseDurability * BZConfig.BZCommonConfig.REINFORCER_LEVEL_4_MULTIPLIER.get()) / 100;
+			default -> baseDurability;
+		};
 	}
 
 	@Override
 	public int getZappingRange(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		return 6 * (SCOPE.getLevel(nbt) + 1);
+		int baseRange = BZConfig.BZCommonConfig.SCOPE_BASE_RANGE.get();
+		int multiplier = BZConfig.BZCommonConfig.SCOPE_RANGE_MULTIPLIER.get();
+		return baseRange + (multiplier * SCOPE.getLevel(nbt));
 	}
 
 	@Override
 	public int getCooldownDelay(ItemStack pStack) {
 		CompoundTag nbt = pStack.getOrCreateTag();
-		return switch (ACCELERATOR.getLevel(nbt)) {
-			case 1 -> 120;
-			case 2 -> 90;
-			case 3 -> 60;
-			case 4 -> 30;
-			case 5 -> 15;
-			case 6 -> 8;
-			case 7 -> 4;
-			case 8 -> 2;
-			default -> 150;
+		int baseCooldown = switch (ACCELERATOR.getLevel(nbt)) {
+			case 1 -> BZConfig.BZCommonConfig.ACCELERATOR_LEVEL_1_COOLDOWN.get();
+			case 2 -> BZConfig.BZCommonConfig.ACCELERATOR_LEVEL_2_COOLDOWN.get();
+			case 3 -> BZConfig.BZCommonConfig.ACCELERATOR_LEVEL_3_COOLDOWN.get();
+			case 4 -> BZConfig.BZCommonConfig.ACCELERATOR_LEVEL_4_COOLDOWN.get();
+			default -> BZConfig.BZCommonConfig.ACCELERATOR_DEFAULT_COOLDOWN.get();
 		};
+
+		int efficiencyLevel = pStack.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY);
+		if (efficiencyLevel > 0) baseCooldown = (int) (baseCooldown * (1.0 - (efficiencyLevel * 0.1)));
+
+		return Math.max(baseCooldown, 1);
+	}
+
+	@Override
+	public boolean isEnchantable(ItemStack stack) {
+		return true;
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public int getEnchantmentValue() {
+		return 15;
+	}
+
+	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+		return enchantment == Enchantments.SILK_TOUCH
+				|| enchantment == Enchantments.BLOCK_FORTUNE
+				|| enchantment == Enchantments.BLOCK_EFFICIENCY
+				|| enchantment == Enchantments.UNBREAKING
+				|| enchantment == Enchantments.MENDING
+				|| enchantment == Enchantments.VANISHING_CURSE;
 	}
 }

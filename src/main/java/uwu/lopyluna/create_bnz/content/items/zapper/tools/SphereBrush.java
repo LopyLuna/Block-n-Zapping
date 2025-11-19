@@ -1,7 +1,7 @@
 package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -50,12 +50,12 @@ public class SphereBrush extends ShapedBrush {
 
 	@Override
 	public Component getParamLabel(int paramIndex) {
-		return Lang.translateDirect("generic.radius");
+		return CreateLang.translateDirect("generic.radius");
 	}
 
 	@Override
 	List<BlockPos> getIncludedPositions() {
-		return cachedBrushes.get(Integer.valueOf(param0));
+		return cachedBrushes.get(param0);
 	}
 
 }

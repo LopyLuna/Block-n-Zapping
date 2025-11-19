@@ -1,11 +1,13 @@
 package uwu.lopyluna.create_bnz.compat.jei;
 
-import com.simibubi.create.foundation.utility.NBTHelper;
+import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
@@ -13,6 +15,7 @@ import uwu.lopyluna.create_bnz.content.recipes.ZapperRecipe;
 import uwu.lopyluna.create_bnz.registry.BZItems;
 import uwu.lopyluna.create_bnz.registry.BZRecipeTypes;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +43,7 @@ public final class ZapperRecipeMaker {
                 }
             }
             ItemStack handgun = new ItemStack(BZItems.BLOCK_ZAPPER.get());
-            assert handgun.getTag() != null;
-            handgun.getTag().putBoolean("jeiView", true);
+            handgun.getOrCreateTag().putBoolean("jeiView", true);
             BlockZapperItem zapperItem = ((BlockZapperItem) handgun.getItem());
             capturedRecipes.add(new ShapedRecipe(zapperRecipe.getId(), zapperRecipe.getGroup(), CraftingBookCategory.MISC, zapperRecipe.getRecipeWidth(), zapperRecipe.getRecipeHeight(),
                     ingredients, zapperItem.setModifierToTier(modifier, tier, handgun)));

@@ -1,8 +1,7 @@
 package uwu.lopyluna.create_bnz.registry;
 
-import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -12,10 +11,10 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.Nullable;
 import uwu.lopyluna.create_bnz.CreateBZ;
 import uwu.lopyluna.create_bnz.content.recipes.ZapperRecipe;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public enum BZRecipeTypes implements IRecipeTypeInfo {
@@ -27,8 +26,8 @@ public enum BZRecipeTypes implements IRecipeTypeInfo {
     private final Supplier<RecipeType<?>> type;
 
     BZRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier, Supplier<RecipeType<?>> typeSupplier, boolean registerType) {
-        String name = Lang.asId(name());
-        id = CreateBZ.asResource(name);
+        String name = CreateLang.asId(name());
+        id = CreateBZ.loc(name);
         serializerObject = BZRecipeTypes.Registers.SERIALIZER_REGISTER.register(name, serializerSupplier);
         @Nullable RegistryObject<RecipeType<?>> typeObject;
         if (registerType) {

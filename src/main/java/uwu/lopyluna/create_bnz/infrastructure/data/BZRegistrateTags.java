@@ -15,8 +15,8 @@ import static uwu.lopyluna.create_bnz.registry.BZTags.AllItemTags.RENEWABLE_GENE
 public class BZRegistrateTags {
 
 	public static void addGenerators() {
-		CreateBZ.REGISTRATE.addDataGenerator(ProviderType.BLOCK_TAGS, BZRegistrateTags::genBlockTags);
-		CreateBZ.REGISTRATE.addDataGenerator(ProviderType.ITEM_TAGS, BZRegistrateTags::genItemTags);
+		CreateBZ.REG.addDataGenerator(ProviderType.BLOCK_TAGS, BZRegistrateTags::genBlockTags);
+		CreateBZ.REG.addDataGenerator(ProviderType.ITEM_TAGS, BZRegistrateTags::genItemTags);
 	}
 	private static void genItemTags(RegistrateTagsProvider<Item> provIn) {
 		TagGen.CreateTagsProvider<Item> prov = new TagGen.CreateTagsProvider<>(provIn, Item::builtInRegistryHolder);

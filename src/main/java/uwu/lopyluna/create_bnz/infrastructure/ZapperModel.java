@@ -1,6 +1,6 @@
 package uwu.lopyluna.create_bnz.infrastructure;
 
-import com.jozufozu.flywheel.core.PartialModel;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.client.resources.model.BakedModel;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;

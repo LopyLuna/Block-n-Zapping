@@ -1,26 +1,24 @@
 package uwu.lopyluna.create_bnz.content.recipes;
 
+import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-
-import com.google.gson.JsonObject;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.NotNull;
 import uwu.lopyluna.create_bnz.content.items.zapper.BlockZapperItem;
 import uwu.lopyluna.create_bnz.content.modifiers.ModifierTier;
 import uwu.lopyluna.create_bnz.content.modifiers.Modifiers;
 import uwu.lopyluna.create_bnz.registry.BZItems;
 import uwu.lopyluna.create_bnz.registry.BZRecipeTypes;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
@@ -110,7 +108,7 @@ public class ZapperRecipe extends ShapedRecipe {
     public static class Serializer extends ShapedRecipe.Serializer {
 
         @Override
-        public @NotNull ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+        public @Nonnull ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             return fromJsonShaped(super.fromJson(recipeId, json), json);
         }
 

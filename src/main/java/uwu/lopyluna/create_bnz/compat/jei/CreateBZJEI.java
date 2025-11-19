@@ -13,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("unused")
 @ParametersAreNonnullByDefault
 public class CreateBZJEI implements IModPlugin {
-    private static final ResourceLocation ID = CreateBZ.asResource("jei_plugin");
+    private static final ResourceLocation ID = CreateBZ.loc("jei_plugin");
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {

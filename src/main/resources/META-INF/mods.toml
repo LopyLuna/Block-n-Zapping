@@ -29,6 +29,6 @@ An addon that Adds back Block Zapper from Old Create Versions & Reimagines it!
 [[dependencies.create_bnz]]
     modId="create"
     mandatory=true
-    versionRange="[0.5.1.f,)"
+    versionRange="[6.0.8,6.1.0)"
     ordering="AFTER"
     side="BOTH"

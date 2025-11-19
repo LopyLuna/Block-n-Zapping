@@ -26,6 +26,9 @@
   "create_bnz.modifier.create_bnz.stasis": "Stasis",
   "create_bnz.modifier.create_bnz.stasis.desc": "Disallow Block Updates",
   "create_bnz.tooltip.holdForModifiers": "Hold ",
+  "generic.offset_x": "Offset X",
+  "generic.offset_y": "Offset Y",
+  "generic.offset_z": "Offset Z",
   "item.create_bnz.handheld_block_zapper": "Handheld Block Zapper",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour1": "_Targeted block_ will become the _material_ placed by the shaper.",
   "item.create_bnz.handheld_block_zapper.tooltip.behaviour2": "Applies currently selected _Brush_ and _Tool_ at the targeted location.",
@@ -34,5 +37,7 @@
   "item.create_bnz.handheld_block_zapper.tooltip.condition2": "R-Click at Block",
   "item.create_bnz.handheld_block_zapper.tooltip.condition3": "R-Click while Sneaking",
   "item.create_bnz.handheld_block_zapper.tooltip.summary": "Survival mode_ tool for medium-scale _landscaping_ from a decent distance.",
-  "itemGroup.create_bnz.base": "Create: Block n' Zapping"
+  "itemGroup.create_bnz.base": "Create: Block n' Zapping",
+  "key.categories.create_bnz": "Create: Block n' Zapping",
+  "key.create_bnz.open_block_zapper_gui": "Open Block Zapper GUI"
 }

@@ -1,19 +1,18 @@
 package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 
 public enum PlacementOptions {
-
 	Merged(AllIcons.I_CENTERED),
 	Attached(AllIcons.I_ATTACHED),
 	Inserted(AllIcons.I_INSERTED);
 
-	public String translationKey;
-	public AllIcons icon;
+	public final String translationKey;
+	public final AllIcons icon;
 
-	private PlacementOptions(AllIcons icon) {
-		this.translationKey = Lang.asId(name());
+	PlacementOptions(AllIcons icon) {
+		this.translationKey = CreateLang.asId(name());
 		this.icon = icon;
 	}
 

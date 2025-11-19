@@ -1,7 +1,7 @@
 package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
 import com.simibubi.create.foundation.utility.BlockHelper;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -23,7 +23,7 @@ public class DynamicBrush extends Brush {
 	}
 
 	public Component getParamLabel(int paramIndex) {
-		return Lang.translateDirect("generic.range");
+		return CreateLang.translateDirect("generic.range");
 	}
 
 	@Override

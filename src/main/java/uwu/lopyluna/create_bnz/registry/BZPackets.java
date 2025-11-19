@@ -14,12 +14,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
-import static uwu.lopyluna.create_bnz.CreateBZ.asResource;
+import static uwu.lopyluna.create_bnz.CreateBZ.loc;
 
 public enum BZPackets {
     CONFIGURE_BLOCK_ZAPPER(ConfigureBlockZapperPacket.class, ConfigureBlockZapperPacket::new, PLAY_TO_SERVER);
 
-    public static final ResourceLocation CHANNEL_NAME = asResource("main");
+    public static final ResourceLocation CHANNEL_NAME = loc("main");
     public static final int NETWORK_VERSION = 3;
     public static final String NETWORK_VERSION_STR = String.valueOf(NETWORK_VERSION);
     private static SimpleChannel channel;

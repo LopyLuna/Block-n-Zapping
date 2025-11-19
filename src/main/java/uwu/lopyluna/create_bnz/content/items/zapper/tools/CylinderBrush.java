@@ -1,7 +1,7 @@
 package uwu.lopyluna.create_bnz.content.items.zapper.tools;
 
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
@@ -71,7 +71,7 @@ public class CylinderBrush extends ShapedBrush {
 
 	@Override
 	public Component getParamLabel(int paramIndex) {
-		return paramIndex == 0 ? Lang.translateDirect("generic.radius") : super.getParamLabel(paramIndex);
+		return paramIndex == 0 ? CreateLang.translateDirect("generic.radius") : super.getParamLabel(paramIndex);
 	}
 
 	@Override

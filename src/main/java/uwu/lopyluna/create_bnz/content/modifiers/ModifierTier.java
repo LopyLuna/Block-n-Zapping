@@ -27,7 +27,7 @@ public enum ModifierTier {
         TIERS.add(this);
     }
 
-    public boolean hasTier() {
-        return this != NONE;
+    public boolean isntTier() {
+        return this == NONE;
     }
 }

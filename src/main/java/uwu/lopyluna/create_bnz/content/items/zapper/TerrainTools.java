@@ -4,7 +4,7 @@ import com.simibubi.create.AllTags;
 import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,7 +50,7 @@ public enum TerrainTools {
 	public final AllIcons icon;
 
 	TerrainTools(AllIcons icon) {
-		this.translationKey = Lang.asId(name());
+		this.translationKey = CreateLang.asId(name());
 		this.icon = icon;
 	}
 
@@ -170,7 +170,7 @@ public enum TerrainTools {
 		if (stasis) pLevel.setBlock(replacePos, paintState, Block.UPDATE_CLIENTS);
 		else pLevel.setBlockAndUpdate(replacePos, paintState);
 		ZapperItem.setBlockEntityData(pLevel, replacePos, paintState, data, player);
-		if (!creative) stack.hurtAndBreak(2, player, b -> b.broadcastBreakEvent(hand));
+		if (!creative) stack.hurtAndBreak(1, player, b -> b.broadcastBreakEvent(hand));
 	}
 
 	public static boolean hasItemInInventory(Block paintBlock, Player player, boolean generator) {
@@ -207,15 +207,15 @@ public enum TerrainTools {
 	public static boolean blacklist(BlockState toBlacklist) {
 		return toBlacklist.is(BZTags.AllBlockTags.BLOCK_ZAPPER_BLACKLIST.tag) || toBlacklist.is(AllTags.AllBlockTags.NON_MOVABLE.tag) || AllTags.AllBlockTags.SAFE_NBT.matches(toBlacklist);
 	}
+
 	public static int meetRequirements(Level pLevel, BlockState paintState, BlockPos replacePos, BlockState replaceState, ItemStack stack, BlockZapperItem zapperItem) {
-		if (paintState == replaceState)
-			return 8;
-		if (replaceState.getBlock().defaultDestroyTime() > zapperItem.getHardnessSupport(stack) && !replaceState.isAir())
-			return 6;
-		if (blacklist(replaceState))
-			return 4;
-		if (!paintState.canSurvive(pLevel, replacePos))
-			return 4;
+		if (paintState == replaceState) return 8;
+
+		float hardness = replaceState.getBlock().defaultDestroyTime();
+		if (hardness < 0 && !replaceState.isAir()) return 6;
+		if (hardness > zapperItem.getHardnessSupport(stack) && !replaceState.isAir()) return 6;
+		if (blacklist(replaceState)) return 4;
+		if (!paintState.canSurvive(pLevel, replacePos)) return 4;
         return pLevel.getWorldBorder().isWithinBounds(replacePos) ? 0 : 4;
     }
 

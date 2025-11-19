@@ -1,13 +1,13 @@
 package uwu.lopyluna.create_bnz.content.items.zapper;
 
-import com.jozufozu.flywheel.core.PartialModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.zapper.ZapperItemRenderer;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModel;
 import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import net.createmod.catnip.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
@@ -30,10 +30,10 @@ import static uwu.lopyluna.create_bnz.content.modifiers.Modifiers.*;
 
 public class BlockZapperItemRenderer extends ZapperItemRenderer {
 
-	protected static final PartialModel CORE = new PartialModel(CreateBZ.asResource("item/handheld_block_zapper/core"));
-	protected static final PartialModel CORE_GLOW = new PartialModel(CreateBZ.asResource("item/handheld_block_zapper/core_glow"));
-	protected static final PartialModel CORE_BULK = new PartialModel(CreateBZ.asResource("item/handheld_block_zapper/augments/glow/core_bulk"));
-	protected static final PartialModel CORE_GLOW_BULK = new PartialModel(CreateBZ.asResource("item/handheld_block_zapper/augments/glow/core_glow_bulk"));
+	protected static final PartialModel CORE = PartialModel.of(CreateBZ.loc("item/handheld_block_zapper/core"));
+	protected static final PartialModel CORE_GLOW = PartialModel.of(CreateBZ.loc("item/handheld_block_zapper/core_glow"));
+	protected static final PartialModel CORE_BULK = PartialModel.of(CreateBZ.loc("item/handheld_block_zapper/augments/glow/core_bulk"));
+	protected static final PartialModel CORE_GLOW_BULK = PartialModel.of(CreateBZ.loc("item/handheld_block_zapper/augments/glow/core_glow_bulk"));
 	public static List<ZapperModel> MODELS = new ArrayList<>();
 
 
@@ -89,13 +89,13 @@ public class BlockZapperItemRenderer extends ZapperItemRenderer {
 
 	public void renderModifierModel(PartialItemModelRenderer renderer, Modifiers modifiers, CompoundTag nbt, int light, boolean ignoreDefault) {
 		ModifierTier tier = modifiers.getTierFromModifier(nbt);
-		if (!tier.hasTier() && ignoreDefault) return;
+		if (tier.isntTier() && ignoreDefault) return;
 		var z = MODELS.stream().filter(m -> m.get(modifiers, tier)).findFirst();
 		z.ifPresent(zModel -> renderer.render(zModel.get(), light));
 	}
 	public void renderSolidModifierModel(PartialItemModelRenderer renderer, Modifiers modifiers, CompoundTag nbt, int light, boolean ignoreDefault) {
 		ModifierTier tier = modifiers.getTierFromModifier(nbt);
-		if (!tier.hasTier() && ignoreDefault) return;
+		if (tier.isntTier() && ignoreDefault) return;
 		var z = MODELS.stream().filter(m -> m.get(modifiers, tier)).findFirst();
 		z.ifPresent(zModel -> renderer.renderSolid(zModel.get(), light));
 	}
@@ -113,7 +113,7 @@ public class BlockZapperItemRenderer extends ZapperItemRenderer {
 			if (!((modifier.isUpgrade && tier == ModifierTier.SPECIAL) || (!modifier.isUpgrade && tier != ModifierTier.SPECIAL))) continue;
 			String tierPath = tier == ModifierTier.NONE ? "" : tier.id + "/";
 			String augPath = path + tierPath + modifier.id;
-			MODELS.add(new ZapperModel(new PartialModel(CreateBZ.asResource(augPath)), modifier, tier));
+			MODELS.add(new ZapperModel(PartialModel.of(CreateBZ.loc(augPath)), modifier, tier));
 		}
 	}
 }

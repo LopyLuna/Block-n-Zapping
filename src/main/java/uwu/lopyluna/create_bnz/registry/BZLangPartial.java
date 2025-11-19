@@ -28,7 +28,16 @@ public class BZLangPartial {
         consume(consumer, zapper + ".too_hard", "Something is too strong in selection!");
         consume(consumer, zapper + ".failed", "Something is invalid in selection!");
 
+        // Keybinds
+        consume(consumer, "key.categories.create_bnz", "Create: Block n' Zapping", true);
+        consume(consumer, "key.create_bnz.open_block_zapper_gui", "Open Block Zapper GUI", true);
+
         consume(consumer, "itemGroup.create_bnz.base", "Create: Block n' Zapping", true);
+
+        // GUI translations | Component.translatable
+        consume(consumer, "generic.offset_x", "Offset X", true);
+        consume(consumer, "generic.offset_y", "Offset Y", true);
+        consume(consumer, "generic.offset_z", "Offset Z", true);
     }
 
     private static void consume(BiConsumer<String, String> consumer, String key, String enUS) {

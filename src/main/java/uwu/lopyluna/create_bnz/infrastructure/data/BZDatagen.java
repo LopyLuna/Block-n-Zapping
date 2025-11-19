@@ -7,6 +7,7 @@ import uwu.lopyluna.create_bnz.registry.BZLangPartial;
 
 import java.util.function.BiConsumer;
 
+@SuppressWarnings("unused")
 public class BZDatagen {
 	public static void gatherData(GatherDataEvent event) {
 		addExtraRegistrateData();
@@ -15,7 +16,7 @@ public class BZDatagen {
 	private static void addExtraRegistrateData() {
 		BZRegistrateTags.addGenerators();
 
-		CreateBZ.REGISTRATE.addDataGenerator(ProviderType.LANG, provider -> {
+		CreateBZ.REG.addDataGenerator(ProviderType.LANG, provider -> {
 			BiConsumer<String, String> langConsumer = provider::add;
 
 			providePartialLang(langConsumer);
